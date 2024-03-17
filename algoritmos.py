@@ -1,6 +1,7 @@
 #/usr/bin/env python3
 
 import tkinter as tk
+import math
 
 class Gui:
     def __init__(self, master) -> None:
@@ -14,8 +15,10 @@ class Gui:
         self.draw_pixel(10,10)
         self.draw_line_bresenham(20,20,150,150)
         self.draw_line_dda(300,100,50,600)
-        self.draw_circle_bresenham(300,200,20)
+        self.draw_circle_bresenham(300,200,90)
         self.draw_line_basic(700,50,800,400)
+        self.draw_circle_polar(200,200,90)
+        self.draw_circle_basic(500, 200, 100)
         
     def draw_pixel(self, x, y):
         x1, y1 = (x,y)
@@ -39,24 +42,8 @@ class Gui:
                 y = m * x + b
                 self.draw_pixel(x, y)
                 x -= 1
-            
-    def draw_line_bresenham(self, x0, y0, x1, y1):
-        dx = abs(x1 - x0)
-        dy = abs(y1 - y0)
-        sx = -1 if x0 > x1 else 1
-        sy = -1 if y0 > y1 else 1
-        err = dx - dy
 
-        while x0 != x1 or y0 != y1:
-            self.draw_pixel(x0, y0)
-            e2 = 2 * err
-            if e2 > -dy:
-                err -= dy
-                x0 += sx
-            if e2 < dx:
-                err += dx
-                y0 += sy
-        
+
     def draw_line_dda(self, x0, y0, x1, y1):
         dx = x1 - x0
         dy = y1 - y0
@@ -76,7 +63,41 @@ class Gui:
             self.draw_pixel(round(x), round(y))
             x += x_increment
             y += y_increment
+
+    
+    def draw_line_bresenham(self, x0, y0, x1, y1):
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        sx = -1 if x0 > x1 else 1
+        sy = -1 if y0 > y1 else 1
+        err = dx - dy
+
+        while x0 != x1 or y0 != y1:
+            self.draw_pixel(x0, y0)
+            e2 = 2 * err
+            if e2 > -dy:
+                err -= dy
+                x0 += sx
+            if e2 < dx:
+                err += dx
+                y0 += sy
+
+    def draw_circle_basic(self, xc, yc, r):
+        for x in range(xc - r, xc + r + 1):
+            y_positivo = yc + int((r ** 2 - (x - xc) **  2) ** 0.5)
+            y_negativo = yc - int((r ** 2 - (x - xc) ** 2) ** 0.5)
+            self.draw_pixel(x, y_positivo)
+            self.draw_pixel(x, y_negativo)
         
+    def draw_circle_polar(self, xc, yc, r):
+        for i in range(360):
+            sin_values = r * math.sin(i * math.pi / 180)
+            cos_values = r * math.cos(i * math.pi / 180) 
+            x = xc + cos_values
+            y = yc + sin_values
+            self.draw_pixel(round(x), round(y))
+
+
     def draw_circle_bresenham(self, x_center, y_center, r):
         x = 0
         y = r
@@ -98,10 +119,11 @@ class Gui:
             else:
                 y -= 1
                 p = p + 2 * (x - y) + 1
+
     
 root = tk.Tk()
 
-root.title("Algoritmos para graficacion")
+root.title("Algoritmos para graficacion")   
 
 my_gui = Gui(root)
 
