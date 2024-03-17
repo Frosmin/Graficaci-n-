@@ -1,5 +1,5 @@
 import tkinter as tk
-
+import time
 # Función para dibujar una línea utilizando el algoritmo de Bresenham
 def draw_line_bresenham(canvas, x0, y0, x1, y1, color):
     dx = abs(x1 - x0)

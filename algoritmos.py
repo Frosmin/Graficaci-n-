@@ -2,6 +2,9 @@
 
 import tkinter as tk
 import math
+import time 
+
+
 
 class Gui:
     def __init__(self, master) -> None:
@@ -12,13 +15,19 @@ class Gui:
         self.canvas.pack()
         self.canvas.config(bg="white")
 
-        self.draw_pixel(10,10)
-        self.draw_line_bresenham(20,20,150,150)
-        self.draw_line_dda(300,100,50,600)
-        self.draw_circle_bresenham(300,200,90)
-        self.draw_line_basic(700,50,800,400)
-        self.draw_circle_polar(200,200,90)
-        self.draw_circle_basic(500, 200, 100)
+      
+        self.draw_line_basic(200,200,100,1)
+        print("")
+        self.draw_line_dda(200,200,100,1)
+        print("")
+        self.draw_line_bresenham(200,200,100,1)
+        
+        print("")
+        self.draw_circle_basic(200, 200, 100) #basico 
+        print("")
+        self.draw_circle_polar(200,200,100)
+        print("")
+        self.draw_circle_bresenham(200,200,100)
         
     def draw_pixel(self, x, y):
         x1, y1 = (x,y)
@@ -26,6 +35,7 @@ class Gui:
         self.canvas.create_rectangle(x1, y1, x2, y2)
 
     def draw_line_basic(self, x0, y0, x1, y1):
+        begin = time.time()
         m = (y1 - y0)/(x1 - x0)       
         b = y0 - m * x0
         
@@ -42,9 +52,16 @@ class Gui:
                 y = m * x + b
                 self.draw_pixel(x, y)
                 x -= 1
+        end = time.time()
+        print(begin)
+        print(end)
+        print(f"timpo de ejecucion linea basico: {end - begin}")
+
+
 
 
     def draw_line_dda(self, x0, y0, x1, y1):
+        begin = time.time()
         dx = x1 - x0
         dy = y1 - y0
 
@@ -63,9 +80,14 @@ class Gui:
             self.draw_pixel(round(x), round(y))
             x += x_increment
             y += y_increment
+            end = time.time()
+        print(begin)
+        print(end)
+        print(f"timpo de ejecucion linea DDA: {end - begin}")
 
     
     def draw_line_bresenham(self, x0, y0, x1, y1):
+        begin = time.time()
         dx = abs(x1 - x0)
         dy = abs(y1 - y0)
         sx = -1 if x0 > x1 else 1
@@ -81,24 +103,38 @@ class Gui:
             if e2 < dx:
                 err += dx
                 y0 += sy
+        end = time.time()
+        print(begin)
+        print(end)
+        print(f"timpo de ejecucion liena bresenham: {end - begin}")
 
     def draw_circle_basic(self, xc, yc, r):
+        begin = time.time()
         for x in range(xc - r, xc + r + 1):
             y_positivo = yc + int((r ** 2 - (x - xc) **  2) ** 0.5)
             y_negativo = yc - int((r ** 2 - (x - xc) ** 2) ** 0.5)
             self.draw_pixel(x, y_positivo)
             self.draw_pixel(x, y_negativo)
+        end = time.time()
+        print(begin)
+        print(end)
+        print(f"Tiempo de ejecución circunferencia basico: {end - begin}")
         
     def draw_circle_polar(self, xc, yc, r):
+        begin = time.time()
         for i in range(360):
             sin_values = r * math.sin(i * math.pi / 180)
             cos_values = r * math.cos(i * math.pi / 180) 
             x = xc + cos_values
             y = yc + sin_values
             self.draw_pixel(round(x), round(y))
-
+        end = time.time()
+        print(f"Tiempo de inicio: {begin}")
+        print(f"Tiempo de fin: {end}")
+        print(f"Tiempo de ejecución circunferencia polar: {end - begin}")
 
     def draw_circle_bresenham(self, x_center, y_center, r):
+        begin = time.time()
         x = 0
         y = r
         p = 1 - r
@@ -119,6 +155,10 @@ class Gui:
             else:
                 y -= 1
                 p = p + 2 * (x - y) + 1
+        end = time.time()
+        print(f"Tiempo de inicio: {begin}")
+        print(f"Tiempo de fin: {end}")
+        print(f"Tiempo de ejecución circunferencia Bresenham: {end - begin}")
 
     
 root = tk.Tk()
