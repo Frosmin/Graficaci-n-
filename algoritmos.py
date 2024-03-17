@@ -7,20 +7,39 @@ class Gui:
         self.master = master
         
         # Crear un lienzo (canvas)
-        self.canvas = tk.Canvas(self.master, width=400, height=300)
+        self.canvas = tk.Canvas(self.master, width=1000, height=700)
         self.canvas.pack()
         self.canvas.config(bg="white")
 
         self.draw_pixel(10,10)
         self.draw_line_bresenham(20,20,150,150)
-        self.draw_line_dda(300,100,50,250)
+        self.draw_line_dda(300,100,50,600)
         self.draw_circle_bresenham(300,200,20)
+        self.draw_line_basic(700,50,800,400)
         
     def draw_pixel(self, x, y):
         x1, y1 = (x,y)
         x2, y2 = (x + 1, y + 1)
         self.canvas.create_rectangle(x1, y1, x2, y2)
 
+    def draw_line_basic(self, x0, y0, x1, y1):
+        m = (y1 - y0)/(x1 - x0)       
+        b = y0 - m * x0
+        
+        self.draw_pixel(x0, y0)
+        x = x0
+        y = y0
+        if x0 < x1:
+            while x <= x1:
+                y = m * x + b
+                self.draw_pixel(x, y)
+                x += 1
+        else:
+            while x >= x1:
+                y = m * x + b
+                self.draw_pixel(x, y)
+                x -= 1
+            
     def draw_line_bresenham(self, x0, y0, x1, y1):
         dx = abs(x1 - x0)
         dy = abs(y1 - y0)
@@ -74,7 +93,7 @@ class Gui:
             self.draw_pixel(x_center - y, y_center - x)
 
             x += 1
-            if p < 0:
+            if p <= 0:
                 p = p + 2 * x + 1;
             else:
                 y -= 1
