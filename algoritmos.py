@@ -58,28 +58,27 @@ class Gui:
             x += x_increment
             y += y_increment
         
-    def draw_circle_bresenham(self, x_center, y_center, radius):
-        x = radius
-        y = 0
-        err = 0
+    def draw_circle_bresenham(self, x_center, y_center, r):
+        x = 0
+        y = r
+        p = 1 - r
 
-        while x >= y:
+        while x < y:
+            self.draw_pixel(x_center + x, y_center + y)
+            self.draw_pixel(x_center - x, y_center + y)
+            self.draw_pixel(x_center + x, y_center - y)
+            self.draw_pixel(x_center - x, y_center - y)
             self.draw_pixel(x_center + y, y_center + x)
             self.draw_pixel(x_center - y, y_center + x)
-            self.draw_pixel(x_center - x, y_center + y)
-            self.draw_pixel(x_center - x, y_center - y)
-            self.draw_pixel(x_center + x, y_center + y)
-            self.draw_pixel(x_center - y, y_center - x)
             self.draw_pixel(x_center + y, y_center - x)
-            self.draw_pixel(x_center + x, y_center - y)
+            self.draw_pixel(x_center - y, y_center - x)
 
-            if err <= 0:
-                y += 1
-                err += 2 * y + 1
-            if err > 0:
-                x -= 1
-                err -= 2 * x + 1
-
+            x += 1
+            if p < 0:
+                p = p + 2 * x + 1;
+            else:
+                y -= 1
+                p = p + 2 * (x - y) + 1
     
 root = tk.Tk()
 
