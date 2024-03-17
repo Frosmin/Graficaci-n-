@@ -13,6 +13,7 @@ class Gui:
 
         self.draw_pixel(10,10)
         self.draw_line_bresenham(20,20,150,150)
+        self.draw_line_dda(300,100,50,250)
         self.draw_circle_bresenham(300,200,20)
         
     def draw_pixel(self, x, y):
@@ -28,7 +29,6 @@ class Gui:
         err = dx - dy
 
         while x0 != x1 or y0 != y1:
-            #self.canvas.create_rectangle(x0, y0, x0 + 1, y0 + 1)
             self.draw_pixel(x0, y0)
             e2 = 2 * err
             if e2 > -dy:
@@ -37,6 +37,26 @@ class Gui:
             if e2 < dx:
                 err += dx
                 y0 += sy
+        
+    def draw_line_dda(self, x0, y0, x1, y1):
+        dx = x1 - x0
+        dy = y1 - y0
+
+        if abs(dx) > abs(dy):
+            steps = abs(dx)
+        else:
+            steps = abs(dy)
+
+        x_increment = dx / steps
+        y_increment = dy / steps
+
+        x = x0
+        y = y0
+
+        for i in range(steps):
+            self.draw_pixel(round(x), round(y))
+            x += x_increment
+            y += y_increment
         
     def draw_circle_bresenham(self, x_center, y_center, radius):
         x = radius
