@@ -13,6 +13,7 @@ class Gui:
 
         self.draw_pixel(10,10)
         self.draw_line_bresenham(20,20,150,150)
+        self.draw_line_dda(300,100,50,250)
         self.draw_circle_bresenham(300,200,20)
         
     def draw_pixel(self, x, y):
@@ -28,7 +29,6 @@ class Gui:
         err = dx - dy
 
         while x0 != x1 or y0 != y1:
-            #self.canvas.create_rectangle(x0, y0, x0 + 1, y0 + 1)
             self.draw_pixel(x0, y0)
             e2 = 2 * err
             if e2 > -dy:
@@ -38,28 +38,47 @@ class Gui:
                 err += dx
                 y0 += sy
         
-    def draw_circle_bresenham(self, x_center, y_center, radius):
-        x = radius
-        y = 0
-        err = 0
+    def draw_line_dda(self, x0, y0, x1, y1):
+        dx = x1 - x0
+        dy = y1 - y0
 
-        while x >= y:
+        if abs(dx) > abs(dy):
+            steps = abs(dx)
+        else:
+            steps = abs(dy)
+
+        x_increment = dx / steps
+        y_increment = dy / steps
+
+        x = x0
+        y = y0
+
+        for i in range(steps):
+            self.draw_pixel(round(x), round(y))
+            x += x_increment
+            y += y_increment
+        
+    def draw_circle_bresenham(self, x_center, y_center, r):
+        x = 0
+        y = r
+        p = 1 - r
+
+        while x < y:
+            self.draw_pixel(x_center + x, y_center + y)
+            self.draw_pixel(x_center - x, y_center + y)
+            self.draw_pixel(x_center + x, y_center - y)
+            self.draw_pixel(x_center - x, y_center - y)
             self.draw_pixel(x_center + y, y_center + x)
             self.draw_pixel(x_center - y, y_center + x)
-            self.draw_pixel(x_center - x, y_center + y)
-            self.draw_pixel(x_center - x, y_center - y)
-            self.draw_pixel(x_center + x, y_center + y)
-            self.draw_pixel(x_center - y, y_center - x)
             self.draw_pixel(x_center + y, y_center - x)
-            self.draw_pixel(x_center + x, y_center - y)
+            self.draw_pixel(x_center - y, y_center - x)
 
-            if err <= 0:
-                y += 1
-                err += 2 * y + 1
-            if err > 0:
-                x -= 1
-                err -= 2 * x + 1
-
+            x += 1
+            if p < 0:
+                p = p + 2 * x + 1;
+            else:
+                y -= 1
+                p = p + 2 * (x - y) + 1
     
 root = tk.Tk()
 
