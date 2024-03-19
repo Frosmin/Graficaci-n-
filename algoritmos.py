@@ -16,18 +16,18 @@ class Gui:
         self.canvas.config(bg="white")
 
       
-        self.draw_line_basic(200,200,100,1)
-        print("")
-        self.draw_line_dda(200,200,100,1)
-        print("")
-        self.draw_line_bresenham(200,200,100,1)
+        # self.draw_line_basic(200,200,100,1)
+        # print("")
+        # self.draw_line_dda(200,200,100,1)
+        # print("")
+        # self.draw_line_bresenham(200,200,100,1)
         
-        print("")
+        # print("")
         self.draw_circle_basic(200, 200, 100) #basico 
         print("")
-        self.draw_circle_polar(200,200,100)
-        print("")
-        self.draw_circle_bresenham(200,200,100)
+        # self.draw_circle_polar(200,200,100)
+        # print("")
+        #self.draw_circle_bresenham(200,200,100)
         
     def draw_pixel(self, x, y):
         x1, y1 = (x,y)
@@ -110,7 +110,7 @@ class Gui:
 
     def draw_circle_basic(self, xc, yc, r):
         begin = time.time()
-        for x in range(xc - r, xc + r + 1):
+        for x in range(xc - r, xc + r ):  #200 200 100      100, 100   
             y_positivo = yc + int((r ** 2 - (x - xc) **  2) ** 0.5)
             y_negativo = yc - int((r ** 2 - (x - xc) ** 2) ** 0.5)
             self.draw_pixel(x, y_positivo)
@@ -139,7 +139,7 @@ class Gui:
         y = r
         p = 1 - r
 
-        while x < y:
+        while x <= y:
             self.draw_pixel(x_center + x, y_center + y)
             self.draw_pixel(x_center - x, y_center + y)
             self.draw_pixel(x_center + x, y_center - y)
