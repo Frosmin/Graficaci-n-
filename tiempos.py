@@ -15,25 +15,50 @@ class Gui:
         self.canvas.pack()
         self.canvas.config(bg="white")
      
-        # self.draw_line_bresenham(200,200,100,1)
+     
+        self.linea_basica = 0
+        self.linea_dda = 0
+        self.linea_bresenham = 0
         
-        # print("")
+        self.circulo_bresem = 0
+        self.circulo_basico = 0
+        self.circulo_polar = 0
         
-        self.tomate = 0
-        self.ricardo = 0
       
-    
-        # for i in range(41):
-        #     self.draw_line_basic(i*10,  i * 10, 500, i * 20)
-        # avr = self.tomate/40
-        # print(f"Promedio de tomate {avr} ")
-    
+  ###########################################################################################  
+        for i in range(41):
+            self.draw_line_basic(i*10,  i * 10, 500, i * 20)
+        avr = self.linea_basica/40
+        print(f"Promedio de linea_basica {avr} ")
+        
+        
+        for i in range(41):
+            self.draw_line_dda(i*10,  i * 10, 500, i * 20)
+        avr2 = self.linea_dda/40
+        print(f"Promedio de linea_basica {avr2} ")
+        
+        for i in range(41):
+            self.draw_line_bresenham(i*10,  i * 10, 500, i * 20)
+        avr3 = self.linea_bresenham/40
+        print(f"Promedio de linea_basica {avr3} ")
+        
+        for i in range(41):
+            self.draw_circle_basic(20 * i,100,50 )
+        avr4 = self.circulo_basico/40
+        print (f"Promedio de circulo_basico {avr4}")
+        
+        for i in range(41):
+            self.draw_circle_polar(20 * i,100,50 )
+        avr5 = self.circulo_polar/40
+        print (f"Promedio de circulo_polar {avr5}")
     
         for i in range(41):
             self.draw_circle_bresenham(20 * i,100,50 )
-        avr2 = self.ricardo/40
-        print (f"Promedio de ricardo {avr2}")
+        avr6 = self.circulo_bresem/40
+        print (f"Promedio de circulo_bresem {avr6}")
             
+  ##########################################################################################      
+        
         
         
     def draw_pixel(self, x, y):
@@ -61,12 +86,10 @@ class Gui:
                 x -= 1
         end = time.time()
         
-        self.tomate += (end - begin)
-        print(begin)
-        print(end)
-        print(f"timpo de ejecucion linea basico: {end - begin}")
-
-
+        self.linea_basica += (end - begin)
+        # print(begin)
+        # print(end)
+        # print(f"timpo de ejecucion linea basico: {end - begin}")
 
 
     def draw_line_dda(self, x0, y0, x1, y1):
@@ -89,10 +112,11 @@ class Gui:
             self.draw_pixel(round(x), round(y))
             x += x_increment
             y += y_increment
-            end = time.time()
-        print(begin)
-        print(end)
-        print(f"timpo de ejecucion linea DDA: {end - begin}")
+        end = time.time()
+        self.linea_dda += (end - begin)    
+        # print(begin)
+        # print(end)
+        # print(f"timpo de ejecucion linea DDA: {end - begin}")
 
     
     def draw_line_bresenham(self, x0, y0, x1, y1):
@@ -113,9 +137,10 @@ class Gui:
                 err += dx
                 y0 += sy
         end = time.time()
-        print(begin)
-        print(end)
-        print(f"timpo de ejecucion liena bresenham: {end - begin}")
+        self.linea_bresenham += (end - begin)
+        # print(begin)
+        # print(end)
+        # print(f"timpo de ejecucion liena bresenham: {end - begin}")
 
     def draw_circle_basic(self, xc, yc, r):
         begin = time.time()
@@ -125,9 +150,10 @@ class Gui:
             self.draw_pixel(x, y_positivo)
             self.draw_pixel(x, y_negativo)
         end = time.time()
-        print(begin)
-        print(end)
-        print(f"Tiempo de ejecución circunferencia basico: {end - begin}")
+        self.circulo_basico += (end - begin)
+        # print(begin)
+        # print(end)
+        # print(f"Tiempo de ejecución circunferencia basico: {end - begin}")
         
     def draw_circle_polar(self, xc, yc, r):
         begin = time.time()
@@ -138,9 +164,10 @@ class Gui:
             y = yc + sin_values
             self.draw_pixel(round(x), round(y))
         end = time.time()
-        print(f"Tiempo de inicio: {begin}")
-        print(f"Tiempo de fin: {end}")
-        print(f"Tiempo de ejecución circunferencia polar: {end - begin}")
+        self.circulo_polar += (end - begin)
+        # print(f"Tiempo de inicio: {begin}")
+        # print(f"Tiempo de fin: {end}")
+        # print(f"Tiempo de ejecución circunferencia polar: {end - begin}")
 
     def draw_circle_bresenham(self, x_center, y_center, r):
         begin = time.time()
@@ -165,10 +192,10 @@ class Gui:
                 y -= 1
                 p = p + 2 * (x - y) + 1
         end = time.time()
-        self.ricardo += (end - begin)
-        print(f"Tiempo de inicio: {begin}")
-        print(f"Tiempo de fin: {end}")
-        print(f"Tiempo de ejecución circunferencia Bresenham: {end - begin}")
+        self.circulo_bresem += (end - begin)
+        # print(f"Tiempo de inicio: {begin}")
+        # print(f"Tiempo de fin: {end}")
+        # print(f"Tiempo de ejecución circunferencia Bresenham: {end - begin}")
 
     
 root = tk.Tk()
