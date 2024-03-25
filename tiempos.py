@@ -20,20 +20,21 @@ class Gui:
         # print("")
         
         self.tomate = 0
+        self.ricardo = 0
       
     
+        # for i in range(41):
+        #     self.draw_line_basic(i*10,  i * 10, 500, i * 20)
+        # avr = self.tomate/40
+        # print(f"Promedio de tomate {avr} ")
+    
+    
         for i in range(41):
-            self.draw_line_basic(i*10,  i * 10, 500, i * 20)
-            # self.draw_line_dda(100, 10, 500, i * 20)
-        avr = self.tomate/40
-        print(f"tomate {avr} ")
-    
-    
-        # self.draw_circle_basic(200, 200, 100) #basico 
-        # print("")
-        # self.draw_circle_polar(200,200,100)
-        # print("")
-        #self.draw_circle_bresenham(200,200,100)
+            self.draw_circle_bresenham(20 * i,100,50 )
+        avr2 = self.ricardo/40
+        print (f"Promedio de ricardo {avr2}")
+            
+        
         
     def draw_pixel(self, x, y):
         x1, y1 = (x,y)
@@ -164,6 +165,7 @@ class Gui:
                 y -= 1
                 p = p + 2 * (x - y) + 1
         end = time.time()
+        self.ricardo += (end - begin)
         print(f"Tiempo de inicio: {begin}")
         print(f"Tiempo de fin: {end}")
         print(f"Tiempo de ejecución circunferencia Bresenham: {end - begin}")
