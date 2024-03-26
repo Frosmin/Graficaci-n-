@@ -21,6 +21,7 @@ class Gui:
 
         self.draw_grid()
 
+        
     
     def draw_grid(self):
         for i in range(self.grid_size):
@@ -125,6 +126,8 @@ class Gui:
             y_negativo = yc - int((r ** 2 - (x - xc) ** 2) ** 0.5) #Calcula la coordenada y negativa del círculo, según la ecuación de la circunferencia.
             self.draw_pixel(x, y_positivo)
             self.draw_pixel(x, y_negativo)
+            self.master.update()
+            time.sleep(0.1)
         end = time.time()
         print(begin)
         print(end)
@@ -138,6 +141,8 @@ class Gui:
             x = xc + cos_values # aqui se convierten las corenads polares a coordenadas cartesianas
             y = yc + sin_values
             self.draw_pixel(round(x), round(y))
+            self.master.update()
+            time.sleep(0.02)    
         end = time.time()
         print(f"Tiempo de inicio: {begin}")
         print(f"Tiempo de fin: {end}")
@@ -193,8 +198,10 @@ def crear_interfaz(name,funcion,titulo,*arg):
     name.mainloop()
 
 if __name__ == "__main__":
-    t1 = Process(target=crear_interfaz, args=("root1","dda","Algoritmo dda linea",10,10,40,35))
-    t2 = Process(target=crear_interfaz, args=("root2","asdf","Algoritmo b linea",10,10,40,35))
+    #t1 = Process(target=crear_interfaz, args=("root1","bres","Algoritmo Bresenham Circunferencia",25,25,10))
+    #t2 = Process(target=crear_interfaz, args=("root2","polar","Algoritmo Polar Circunferencia",25,25,10))
+    t1 = Process(target=crear_interfaz, args=("root1","dda","Algoritmo DDA Linea",1,1,15,45))
+    t2 = Process(target=crear_interfaz, args=("root2","asdf","Algoritmo Bresenham Linea",1,1,15,45))
 
     t1.start()
     t2.start()
