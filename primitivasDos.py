@@ -292,7 +292,7 @@ class Gui:
                 # Pintar la línea horizontal entre los puntos de intersección
                 for x in range(x_start, x_end + 1):
                     self.canvas.create_rectangle(x, y, x + 1, y + 1, fill=color, outline=color)
-                    self.master.update()    
+                    #self.master.update()    
             # Opcional: Pintar los píxeles individuales
             # for x in range(x_start, x_end + 1):
             #     self.draw_pixel(x, y, color=color)
