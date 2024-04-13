@@ -18,7 +18,6 @@ class Gui:
         self.es_linea = False 
         self.es_circulo = False
         self.es_triangulo = False
-        self.ready_to_draw = False
         self.tipo = tk.IntVar(value=0)
         
 
@@ -148,7 +147,6 @@ class Gui:
             x, y = punto
             self.canvas.create_oval(x, y, x+1, y+1, fill=self.color.get())  # Dibuja un punto en el lienzo
         
-        
     def color_picker(self):
         self.color.set(colorchooser.askcolor()[1])
         if self.color.get() == 'None':
@@ -222,7 +220,6 @@ class Gui:
                                   color=self.color.get(), 
                                   tipo=self.tipo.get(), 
                                   grosor=self.spn_int.get()) 
-        self.is_drawing=False
     
     def draw_circle(self):
         def calc_r(x1,y1,x2,y2):
@@ -251,44 +248,7 @@ class Gui:
         def draw_pixel(self, x, y, color="black", grosor=1):
             x1, y1 = (x,y)
             x2, y2 = ((x+grosor), (y+grosor))
-            self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, width=0)        
-                
-        def draw_line_basic(self, x0, y0, x1, y1):
-            m = (y1 - y0)/(x1 - x0)       
-            b = y0 - m * x0
-                
-            self.draw_pixel(x0, y0)
-            x = x0
-            y = y0
-            if x0 < x1:
-                while x <= x1:
-                    y = m * x + b
-                    self.draw_pixel(x, y)
-                    x += 1
-            else:
-                while x >= x1:
-                    y = m * x + b
-                    self.draw_pixel(x, y)
-                    x -= 1
-
-        def draw_line_dda(self, x0, y0, x1, y1):
-            begin = time.time()
-            dx = x1 - x0
-            dy = y1 - y0
-            if abs(dx) > abs(dy):
-                steps = abs(dx)
-            else:
-                steps = abs(dy)
-            x_increment = dx / steps
-            y_increment = dy / steps
-            x = x0
-            y = y0
-            for i in range(steps):
-                self.draw_pixel(round(x), round(y))
-                x += x_increment
-                y += y_increment
-                end = time.time()
-                self.master.update()              
+            self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, width=0)              
 
         def draw_line_bresenham(self, x0, y0, x1, y1, color="black", tipo=0, grosor=1):
             dx = abs(x1 - x0) 
@@ -321,21 +281,6 @@ class Gui:
             x1, y1 = (x,y)
             x2, y2 = ((x+grosor), (y+grosor))
             self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, width=0)
-
-        def draw_circle_basic(self, xc, yc, r):
-            for x in range(xc - r, xc + r ):  #200 200 100      100, 100   
-                y_positivo = yc + int((r ** 2 - (x - xc) **  2) ** 0.5)
-                y_negativo = yc - int((r ** 2 - (x - xc) ** 2) ** 0.5)
-                self.draw_pixel(x, y_positivo)
-                self.draw_pixel(x, y_negativo)
-
-        def draw_circle_polar(self, xc, yc, r):
-            for i in range(360):
-                sin_values = r * math.sin(i * math.pi / 180)
-                cos_values = r * math.cos(i * math.pi / 180) 
-                x = xc + cos_values
-                y = yc + sin_values
-                self.draw_pixel(round(x), round(y))  
   
         def draw_circle_bresenham(self, x_center, y_center, r, color="black", tipo=0, grosor=1):
             def draw():
