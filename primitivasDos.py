@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter import colorchooser, ttk, filedialog
 import math
+import time
 from PIL import Image, ImageTk , ImageGrab
 
 class Gui:
@@ -104,6 +105,7 @@ class Gui:
         self.canvas.bind('<Button-1>', self.handle_click)
         self.master.bind('<Escape>', self.event_scape)
         self.cmb_tipo.bind('<<ComboboxSelected>>', self.escoger_tipo)
+        self.canvas.bind("<Button-3>", self.show_popup_menu)
         #self.spb_grosor.bind('<<Increment o Decrement :v>>')
         
         
@@ -207,7 +209,7 @@ class Gui:
             self.puntos.append((x,y))
             if len(self.puntos) == 3:
                 self.draw_triangle()
-                self.puntos.clear()
+                #self.puntos.clear()
 
         print(self.puntos)
         if self.ready_to_draw:
@@ -242,7 +244,61 @@ class Gui:
         linea.draw_line_bresenham(*p1,*p2, color=self.color.get(), tipo=self.tipo.get(), grosor=self.spn_int.get())
         linea.draw_line_bresenham(*p2,*p3, color=self.color.get(), tipo=self.tipo.get(), grosor=self.spn_int.get())
         linea.draw_line_bresenham(*p3,*p1, color=self.color.get(), tipo=self.tipo.get(), grosor=self.spn_int.get())
+    def show_popup_menu(self, event):
+        menu = tk.Menu(self.master, tearoff=0)
+        menu.add_command(label="Rellenar Triangulo", command=self.rellenar_triangulo)
+        menu.add_command(label="Salir", command=self.master.quit)
+        menu.post(event.x_root, event.y_root)
 
+    def rellenar_triangulo(self):
+        color = self.color.get()
+
+        p1 = self.puntos[0]
+        p2 = self.puntos[1]
+        p3 = self.puntos[2]
+
+        y_min = min(p1[1], p2[1], p3[1])
+        y_max = max(p1[1], p2[1], p3[1])
+
+        edges = []
+
+        edges.append((p1, p2))
+        edges.append((p2, p3))
+        edges.append((p3, p1))
+
+        edges.sort(key=lambda edge: edge[0][1])
+
+        active_edges = []
+
+        for y in range(y_min, y_max + 1):
+            active_edges = [edge for edge in active_edges if edge[1][1] > y]
+
+            for edge in edges:
+                if edge[0][1] <= y < edge[1][1] or edge[1][1] <= y < edge[0][1]:
+                    active_edges.append(edge)
+
+            active_edges.sort(key=lambda edge: (edge[0][0] + (edge[1][0] - edge[0][0]) *
+                                             (y - edge[0][1]) / (edge[1][1] - edge[0][1])))
+
+            for i in range(0, len(active_edges), 2):
+                if i + 1 < len(active_edges):  
+                    x_start = int(active_edges[i][0][0] + (y - active_edges[i][0][1]) *
+                                (active_edges[i][1][0] - active_edges[i][0][0]) /
+                                (active_edges[i][1][1] - active_edges[i][0][1]))
+                    x_end = int(active_edges[i + 1][0][0] + (y - active_edges[i + 1][0][1]) *
+                                (active_edges[i + 1][1][0] - active_edges[i + 1][0][0]) /
+                                (active_edges[i + 1][1][1] - active_edges[i + 1][0][1]))
+
+                # Pintar la línea horizontal entre los puntos de intersección
+                for x in range(x_start, x_end + 1):
+                    self.canvas.create_rectangle(x, y, x + 1, y + 1, fill=color, outline=color)
+                    self.master.update()    
+            # Opcional: Pintar los píxeles individuales
+            # for x in range(x_start, x_end + 1):
+            #     self.draw_pixel(x, y, color=color)
+
+    # Limpiar los bordes activos
+        active_edges.clear()
     class Line():
         def __init__(self, canva) -> None:
             self.canvas = canva
