@@ -1,13 +1,9 @@
 #/usr/bin/env python3
 
 import tkinter as tk
-from tkinter import colorchooser
+from tkinter import colorchooser, ttk
 import math
-import time 
 from PIL import Image, ImageTk
-
-
-
 
 class Gui:
     def __init__(self, master) -> None:
@@ -21,7 +17,10 @@ class Gui:
         self.puntos = list()
         self.es_linea = False 
         self.es_circulo = False
+        self.es_triangulo = False
         self.ready_to_draw = False
+        self.tipo = tk.IntVar(value=0)
+        
 
         # Frame opciones
         self.frame_options = tk.Frame(self.master, width=700, height=100)
@@ -30,13 +29,49 @@ class Gui:
 
         # Boton linea
         self.img_linea = ImageTk.PhotoImage(Image.open('./images/linea.png').resize((20,20)))
-        self.boton_linea = tk.Button(self.frame_options, width=20, height=20, image=self.img_linea, command= self.set_linea)
+        self.boton_linea = tk.Button(self.frame_options, 
+                                     width=20, height=20, 
+                                     image=self.img_linea, 
+                                     command= self.set_linea, 
+                                     )
         self.boton_linea.pack(side='left')
-
+    
         # Boton circulo
         self.img_circulo = ImageTk.PhotoImage(Image.open('./images/circulo.png').resize((17,17)))
-        self.boton_circulo = tk.Button(self.frame_options, width=20, height=20, image=self.img_circulo, command= self.set_circulo)
+        self.boton_circulo = tk.Button(self.frame_options, 
+                                       width=20, height=20, 
+                                       image=self.img_circulo, 
+                                       command= self.set_circulo,
+                                       )
         self.boton_circulo.pack(side='left')
+
+        # Boton triangulo
+        self.img_triangulo = ImageTk.PhotoImage(Image.open('./images/triangulo.png').resize((17,17)))
+        self.boton_triangulo = tk.Button(self.frame_options, 
+                                       width=20, height=20, 
+                                       image=self.img_triangulo, 
+                                       command= self.set_triangulo,
+                                       )
+        self.boton_triangulo.pack(side='left')
+
+        # Combo box tipo
+        self.tipo_linea = ['Normal', 'Segmentado']
+        self.cmb_str = tk.StringVar(value=self.tipo_linea[0])
+        self.cmb_tipo = ttk.Combobox(self.frame_options, 
+                                     values=self.tipo_linea, 
+                                     textvariable=self.cmb_str,
+                                     width=12)
+        self.cmb_tipo.pack(side='left')
+
+        # Spin box grosor
+        self.grosor_linea = [x for x in range(1,11)]
+        self.spn_int = tk.IntVar(value=self.grosor_linea[0])
+        self.spb_grosor = ttk.Spinbox(self.frame_options, 
+                                      from_=1, to=10, 
+                                      increment=1, 
+                                      textvariable=self.spn_int,
+                                      width=3)
+        self.spb_grosor.pack(side='left')
 
         # Combo box elementos
 
@@ -61,28 +96,56 @@ class Gui:
         self.frame_canva.pack()
         
         # Crear un lienzo (canvas)
-        #self.canvas = tk.Canvas(self.master, width=self.grid_size*self.pixel_size, height=self.grid_size*self.pixel_size)
         self.canvas = tk.Canvas(self.frame_canva, width=700, height=500)
         self.canvas.pack()
         self.canvas.config(bg="white")
-        #self.draw_grid()
 
         # Eventos
         self.canvas.bind('<Button-1>', self.handle_click)
-
+        self.master.bind('<Escape>', self.event_scape)
+        self.cmb_tipo.bind('<<ComboboxSelected>>', self.escoger_tipo)
+        #self.spb_grosor.bind('<<Increment o Decrement :v>>')
         
     def color_picker(self):
         self.color.set(colorchooser.askcolor()[1])
-    
+        if self.color.get() == 'None':
+            self.color.set(value='black')
+        
+    def escoger_tipo(self, event):
+        self.tipo.set(self.cmb_tipo.current()) 
+
+    def event_scape(self, event):
+        self.es_circulo=False
+        self.es_linea=False
+        self.es_triangulo=False
+        self.boton_circulo.config(bg='misty rose')
+        self.boton_linea.config(bg='misty rose')
+        self.boton_triangulo.config(bg='misty rose')
+
     def set_linea(self):
         self.puntos.clear()
-        self.es_circulo = False
-        self.es_linea = True
+        self.es_circulo=False ; self.es_triangulo=False
+        self.es_linea=True
+        self.boton_linea.config(bg='#ffff80')
+        self.boton_circulo.config(bg='misty rose')
+        self.boton_triangulo.config(bg='misty rose')
     
     def set_circulo(self):
         self.puntos.clear()
-        self.es_linea = False
-        self.es_circulo = True
+        self.es_linea=False ; self.es_triangulo=False
+        self.es_circulo=True
+        self.boton_circulo.config(bg='#ffff80')
+        self.boton_linea.config(bg='misty rose')
+        self.boton_triangulo.config(bg='misty rose')
+
+    def set_triangulo(self):
+        self.puntos.clear()
+        self.es_linea=False
+        self.es_triangulo=True
+        self.es_circulo=False
+        self.boton_triangulo.config(bg='#ffff80')
+        self.boton_circulo.config(bg='misty rose')
+        self.boton_linea.config(bg='misty rose')
 
     def handle_click(self, event = None):
         x , y = int(event.x) , int(event.y)
@@ -97,12 +160,21 @@ class Gui:
             if len(self.puntos) == 2:
                 self.draw_circle()
                 self.puntos.clear()
+        elif self.es_triangulo:
+            self.puntos.append((x,y))
+            if len(self.puntos) == 3:
+                self.draw_triangle()
+                self.puntos.clear()
 
         print(self.puntos)
 
     def draw_line(self):
         linea = self.Line(self.canvas) 
-        linea.draw_line_bresenham(*self.puntos[-1],*self.puntos[-2], color=self.color.get()) 
+        p1,p2 = self.puntos
+        linea.draw_line_bresenham(*p1,*p2, 
+                                  color=self.color.get(), 
+                                  tipo=self.tipo.get(), 
+                                  grosor=self.spn_int.get()) 
         self.is_drawing=False
     
     def draw_circle(self):
@@ -110,15 +182,28 @@ class Gui:
             r = round(math.sqrt((x2-x1)**2 + (y2-y1)**2))
             return r
         circulo = self.Circle(self.canvas)
-        circulo.draw_circle_bresenham(*self.puntos[0], calc_r(*self.puntos[0], *self.puntos[1]), color=self.color.get())
+        p1,p2 = self.puntos
+        circulo.draw_circle_bresenham(*p1, 
+                                      calc_r(*p1, *p2), 
+                                      color=self.color.get(), 
+                                      tipo=self.tipo.get(), 
+                                      grosor=self.spn_int.get())
+
+    def draw_triangle(self):
+        linea = self.Line(self.canvas)
+        p1,p2,p3 = self.puntos
+        linea.draw_line_bresenham(*p1,*p2, color=self.color.get(), tipo=self.tipo.get(), grosor=self.spn_int.get())
+        linea.draw_line_bresenham(*p2,*p3, color=self.color.get(), tipo=self.tipo.get(), grosor=self.spn_int.get())
+        linea.draw_line_bresenham(*p3,*p1, color=self.color.get(), tipo=self.tipo.get(), grosor=self.spn_int.get())
 
     class Line():
         def __init__(self, canva) -> None:
             self.canvas = canva
+            self.segment = 15
 
-        def draw_pixel(self, x, y, color="black"):
+        def draw_pixel(self, x, y, color="black", grosor=1):
             x1, y1 = (x,y)
-            x2, y2 = ((x+1), (y+1))
+            x2, y2 = ((x+grosor), (y+grosor))
             self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, width=0)        
                 
         def draw_line_basic(self, x0, y0, x1, y1):
@@ -156,17 +241,22 @@ class Gui:
                 x += x_increment
                 y += y_increment
                 end = time.time()
-                self.master.update()
-                
+                self.master.update()              
 
-        def draw_line_bresenham(self, x0, y0, x1, y1, color="black"):
+        def draw_line_bresenham(self, x0, y0, x1, y1, color="black", tipo=0, grosor=1):
             dx = abs(x1 - x0) 
             dy = abs(y1 - y0) 
             sx = -1 if x0 > x1 else 1
             sy = -1 if y0 > y1 else 1
             err = dx - dy
             while x0 != x1 or y0 != y1:
-                self.draw_pixel(x0, y0, color=color)
+                if tipo == 1:
+                    if self.segment == 0: self.segment = 15
+                    if self.segment > 5:
+                        self.draw_pixel(x0, y0, color=color, grosor=grosor)
+                    self.segment-=1
+                else:
+                    self.draw_pixel(x0, y0, color=color, grosor=grosor)
                 e2 = 2 * err
                 if e2 > -dy:
                     err -= (dy)
@@ -174,15 +264,15 @@ class Gui:
                 if e2 < dx:
                     err += (dx)
                     y0 += (sy)
-                
        
     class Circle():
         def __init__(self, canva) -> None:
             self.canvas = canva
+            self.segment = 15
 
-        def draw_pixel(self, x, y, color="black"):
+        def draw_pixel(self, x, y, color="black", grosor=1):
             x1, y1 = (x,y)
-            x2, y2 = ((x+1), (y+1))
+            x2, y2 = ((x+grosor), (y+grosor))
             self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, width=0)
 
         def draw_circle_basic(self, xc, yc, r):
@@ -200,21 +290,28 @@ class Gui:
                 y = yc + sin_values
                 self.draw_pixel(round(x), round(y))  
   
-        def draw_circle_bresenham(self, x_center, y_center, r, color="black"):
+        def draw_circle_bresenham(self, x_center, y_center, r, color="black", tipo=0, grosor=1):
+            def draw():
+                self.draw_pixel(x_center + x, y_center + y, color=color, grosor=grosor)
+                self.draw_pixel(x_center - x, y_center + y, color=color, grosor=grosor)
+                self.draw_pixel(x_center + x, y_center - y, color=color, grosor=grosor)
+                self.draw_pixel(x_center - x, y_center - y, color=color, grosor=grosor)
+                self.draw_pixel(x_center + y, y_center + x, color=color, grosor=grosor)
+                self.draw_pixel(x_center - y, y_center + x, color=color, grosor=grosor)
+                self.draw_pixel(x_center + y, y_center - x, color=color, grosor=grosor)
+                self.draw_pixel(x_center - y, y_center - x, color=color, grosor=grosor)
             x = 0
             y = r
             p = 1 - r
 
             while x <= y:
-                self.draw_pixel(x_center + x, y_center + y, color=color)
-                self.draw_pixel(x_center - x, y_center + y, color=color)
-                self.draw_pixel(x_center + x, y_center - y, color=color)
-                self.draw_pixel(x_center - x, y_center - y, color=color)
-                self.draw_pixel(x_center + y, y_center + x, color=color)
-                self.draw_pixel(x_center - y, y_center + x, color=color)
-                self.draw_pixel(x_center + y, y_center - x, color=color)
-                self.draw_pixel(x_center - y, y_center - x, color=color)
-
+                if tipo == 1:
+                    if self.segment == 0: self.segment = 15
+                    if self.segment > 5:
+                        draw()
+                    self.segment-=1
+                else:
+                    draw()
                 x += 1
                 if p <= 0:
                     p = p + 2 * x + 1;
@@ -225,6 +322,6 @@ class Gui:
 if __name__ == "__main__":
     root = tk.Tk()
     my_gui = Gui(root)
-    root.title('Grafiación por computadora')
+    root.title('Mi Paint')
     root.iconbitmap(bitmap='./images/tortuga.ico')
     root.mainloop()
