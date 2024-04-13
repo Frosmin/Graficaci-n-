@@ -253,46 +253,35 @@ class Gui:
     def rellenar_triangulo(self):
         color = self.color.get()
 
-    # Obtener los puntos del triángulo desde self.puntos
         p1 = self.puntos[0]
         p2 = self.puntos[1]
         p3 = self.puntos[2]
 
-    # Obtener los límites verticalmente del triángulo
         y_min = min(p1[1], p2[1], p3[1])
         y_max = max(p1[1], p2[1], p3[1])
 
-    # Crear una lista para almacenar los bordes del triángulo
         edges = []
 
-    # Agregar las tres líneas del triángulo a la lista de bordes
         edges.append((p1, p2))
         edges.append((p2, p3))
         edges.append((p3, p1))
 
-    # Ordenar las líneas por su coordenada y
         edges.sort(key=lambda edge: edge[0][1])
 
-    # Crear una lista para almacenar los bordes activos
         active_edges = []
 
-    # Iterar sobre cada línea horizontal del triángulo
         for y in range(y_min, y_max + 1):
-        # Eliminar los bordes activos cuyo y máximo sea menor o igual a y
             active_edges = [edge for edge in active_edges if edge[1][1] > y]
 
-        # Agregar los bordes activos correspondientes a esta línea
             for edge in edges:
                 if edge[0][1] <= y < edge[1][1] or edge[1][1] <= y < edge[0][1]:
                     active_edges.append(edge)
 
-        # Ordenar los bordes activos por su coordenada x del punto de intersección con y
             active_edges.sort(key=lambda edge: (edge[0][0] + (edge[1][0] - edge[0][0]) *
                                              (y - edge[0][1]) / (edge[1][1] - edge[0][1])))
 
-        # Iterar sobre cada par de bordes activos para pintar la línea horizontal
             for i in range(0, len(active_edges), 2):
-                if i + 1 < len(active_edges):  # Verificar si hay suficientes elementos en active_edges
+                if i + 1 < len(active_edges):  
                     x_start = int(active_edges[i][0][0] + (y - active_edges[i][0][1]) *
                                 (active_edges[i][1][0] - active_edges[i][0][0]) /
                                 (active_edges[i][1][1] - active_edges[i][0][1]))
