@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
-from tkinter import colorchooser, simpledialog
+from tkinter import colorchooser
 import math
 from PIL import Image, ImageGrab
 import os
@@ -23,9 +23,7 @@ class Gui:
         self.lista_elementos= list()
         self.lista_elementos_nombre = list()
         self.elemento_num = 1
-        self.current_object = None  # ver que elemento esta seleccionado
-        
-        self.figura_seleccionada = None
+        self.current_object = None
 
         # Frame opciones
         self.frame_options = ctk.CTkFrame(self.master, width=700, height=100)
@@ -136,110 +134,6 @@ class Gui:
         self.canvas.bind('<Button-1>', self.handle_click)
         self.master.bind('<Escape>', self.event_scape)
         self.canvas.bind("<Button-3>", self.show_popup_menu)
-        
-        
-        
-    def escalar(self):
-        # Muestra una ventana emergente para obtener sx
-        aumento = simpledialog.askfloat("Escalar", "Introduce el valor de sx")  #ver que sea entero
-        if aumento is None:  # Si el usuario canceló la ventana emergente
-            return
-
-        
-        if isinstance(self.current_object, self.Triangulo):
-                print("es triangulo")
-                print (f"Escalando {self.current_object.puntos} con aumento={aumento}")
-                puntos = self.current_object.puntos
-
-                # Calcular el punto medio del triángulo
-                punto_medio = ((puntos[0][0] + puntos[1][0] + puntos[2][0]) // 3, 
-                            (puntos[0][1] + puntos[1][1] + puntos[2][1]) // 3)
-
-               
-                # Escalar los puntos del triángulo respecto al punto medio y redondear los resultados
-        
-                puntos_escalados = [tuple(round(punto_medio[i] + aumento * (valor - punto_medio[i])) for i, valor in enumerate(punto)) for punto in puntos]
-                print(puntos_escalados)  # Imprime los puntos del triángulo escalado
-
-                self.current_object.delete()
-                
-                
-
-                # Dibujar el triángulo escalado
-                self.current_object.draw(*puntos_escalados[0], *puntos_escalados[1], *puntos_escalados[2],
-                                        color=self.color.get(), 
-                                        tipo=self.cmb_tipo.get(), 
-                                        grosor=self.slider_grosor.get())
-                
-                self.current_object.puntos = puntos_escalados
-                        
-                        
-            
-            
-            
-        
-        if isinstance(self.current_object, self.Circle):
-            print("es circulo")
-            print (f"Escalando {self.current_object.puntos} con aumento={aumento}")
-            puntos = self.current_object.puntos
-            print (puntos[0][0] + aumento)
-            
-            p1 = self.current_object.puntos[0] #centro
-            p2 = self.current_object.puntos[1]
-            
-            p2 = tuple(valor * aumento for valor in p2)
-            
-            self.current_object.delete()
-            self.current_object.draw(*p1, *p2,
-                                     color=self.color.get(), 
-                                     tipo=self.cmb_tipo.get(), 
-                                     grosor=self.slider_grosor.get())
-            
-            self.current_object.puntos = [p1,p2]
-            
-            
-            
-                        
-        
-        if isinstance(self.current_object, self.Line):
-            print("es linea")
-            print (f"Escalando {self.current_object.puntos} con aumento={aumento}")
-            # p1 = self.current_object.puntos[0]
-            # p2 = self.current_object.puntos[1]
-
-            # p1= tuple(valor + aumento for valor in p1)
-            # p2 = tuple(valor + aumento for valor in p2)
-            
-            puntos = self.current_object.puntos
-            # puntos_aumentados = [tuple(valor + aumento for valor in punto) for punto in puntos]
-            
-            # # print(p1)
-            # # print(p2)
-            # #self.current_object.puntos = [p1,p2]
-            
-            # Calcular el punto medio de la línea
-            punto_medio = ((puntos[0][0] + puntos[1][0]) // 2, (puntos[0][1] + puntos[1][1]) // 2)
-
-            # Escalar los puntos de la línea respecto al punto medio
-            puntos_escalados = [tuple(punto_medio[i] + aumento * (valor - punto_medio[i]) for i, valor in enumerate(punto)) for punto in puntos]
-
-            print(puntos_escalados)  # Imprime los puntos de la línea escalada
-            #print(self.current_object.puntos)
-            self.current_object.delete()
-            # print(puntos_aumentados)
-            
-            # Dibujar el triángulo escalado
-            self.current_object.draw(*puntos_escalados[0], *puntos_escalados[1], *puntos_escalados[2],
-                                    color=self.color.get(), 
-                                    tipo=self.cmb_tipo.get(), 
-                                    grosor=self.slider_grosor.get())
-            
-            self.current_object.puntos = puntos_escalados
-            
-           
-    
-    
-    
     
     def guardar_imagen(self):
         ruta = tk.filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg")])
@@ -259,7 +153,19 @@ class Gui:
             self.puntos[i] = (self.puntos[i][0] + dx, self.puntos[i][1] + dy)
         self.redibujar()
 
-   
+    """def trasladar(self):
+        to = self.puntos[0]
+        if isinstance(elemento, self.Line):
+            p1,p2 = elemento.puntos
+            elemento.delte()
+            elemento.draw_line_bresenham()
+        if is"""
+
+    def escalar(self, sx, sy):
+        for i in range(len(self.puntos)):
+            self.puntos[i] = (self.puntos[i][0] * sx, self.puntos[i][1] * sy)
+        self.redibujar()
+
     def rotar(self, theta):
         theta = math.radians(theta)
         for i in range(len(self.puntos)):
@@ -269,18 +175,13 @@ class Gui:
         self.redibujar()
 
     def redibujar(self):
-        # Borra todas las figuras del canvas
-        self.canvas.delete("all")
-
-        # Dibuja la figura seleccionada
-        if self.figura_seleccionada:
-            puntos = self.figura_seleccionada
-            for i in range(len(puntos) - 1):
-                self.canvas.create_line(puntos[i][0], puntos[i][1], puntos[i+1][0], puntos[i+1][1])
+        self.canvas.delete('all')  # Elimina todos los elementos del lienzo
+        for punto in self.puntos:
+            x, y = punto
+            self.canvas.create_oval(x, y, x+1, y+1, fill=self.color.get())  # Dibuja un punto en el lienzo
 
     def handle_click(self, event = None):
         x , y = int(event.x) , int(event.y)
-        self.figura_seleccionada = self.puntos
 
         if self.es_linea:
             self.puntos.append((x,y))
@@ -441,63 +342,96 @@ class Gui:
     def show_popup_menu(self, event):
         menu = tk.Menu(self.master, tearoff=0)
         menu.add_command(label="Trasladar")
+        menu.add_command(label="rellenar_circunferencia", command=self.rellenar_circunferencia)
         menu.add_command(label="Rellenar Triangulo", command=self.rellenar_triangulo)
         menu.add_command(label="Actualizar elemento", command=self.update_element)
         menu.add_command(label="Eliminar elemento", command=self.delete)
         menu.add_command(label="Save", command= self.guardar_imagen)
         menu.add_command(label="Limpiar", command=lambda: self.canvas.delete('all'))
-        menu.add_command(label="Escalar", command=self.escalar)
         menu.post(event.x_root, event.y_root)
+    def get_pixel_color(self, x, y):
+        image = self.canvas.create_image(0, 0, anchor="nw", image=self.canvas._image_tk)
+        color = image.get(x, y)
+        if color:
+            return "#" + color
+        else:
+            return None
+        
+        
+    def rellenar_circunferencia(self):
+        if isinstance(self.current_object, self.Circle):
+            color = self.color.get()
+            x_center, y_center = self.current_object.puntos[0]
+            radio = self.current_object.calc_r(x_center, y_center, *self.current_object.puntos[1])  # Calcular el radio
+            self.flood_fill_circle(x_center, y_center, radio, color)  # Pasar radio como argumento
+
+    def flood_fill_circle(self, x_center, y_center, radio, color):  # Añadir radio como parámetro
+        for y in range(y_center - radio, y_center + radio):
+            for x in range(x_center - radio, x_center + radio):
+                if (x - x_center) ** 2 + (y - y_center) ** 2 <= radio ** 2:
+                    self.canvas.create_rectangle(x, y, x + 1, y + 1, fill=color, outline=color)
+
+
+
+
+    def is_pixel_filled(self, x, y):
+    # Obtener todos los elementos que se superponen con el píxel en las coordenadas (x, y)
+        items = self.canvas.find_overlapping(x, y, x+1, y+1)
+        return len(items) > 0
+    def calc_r(self, x1, y1, x2, y2):
+        radius = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+        return radius
+    
+    
 
     def rellenar_triangulo(self):
         color = self.color.get()
 
-        p1 = self.puntos[0]
-        p2 = self.puntos[1]
-        p3 = self.puntos[2]
+        if isinstance(self.current_object, self.Triangulo):
 
-        y_min = min(p1[1], p2[1], p3[1])
-        y_max = max(p1[1], p2[1], p3[1])
+            p1 = self.current_object.puntos[0]
+            p2 = self.current_object.puntos[1]
+            p3 = self.current_object.puntos[2]
 
-        edges = []
+            y_min = min(p1[1], p2[1], p3[1])
+            y_max = max(p1[1], p2[1], p3[1])
 
-        edges.append((p1, p2))
-        edges.append((p2, p3))
-        edges.append((p3, p1))
+            edges = []
 
-        edges.sort(key=lambda edge: edge[0][1])
+            edges.append((p1, p2))
+            edges.append((p2, p3))
+            edges.append((p3, p1))
 
-        active_edges = []
+            edges.sort(key=lambda edge: edge[0][1])
 
-        for y in range(y_min, y_max + 1):
-            active_edges = [edge for edge in active_edges if edge[1][1] > y]
+            active_edges = []
 
-            for edge in edges:
-                if edge[0][1] <= y < edge[1][1] or edge[1][1] <= y < edge[0][1]:
-                    active_edges.append(edge)
+            for y in range(y_min, y_max + 1):
+                active_edges = [edge for edge in active_edges if edge[1][1] > y]
 
-            active_edges.sort(key=lambda edge: (edge[0][0] + (edge[1][0] - edge[0][0]) *
-                                             (y - edge[0][1]) / (edge[1][1] - edge[0][1])))
+                for edge in edges:
+                    if edge[0][1] <= y < edge[1][1] or edge[1][1] <= y < edge[0][1]:
+                        active_edges.append(edge)
 
-            for i in range(0, len(active_edges), 2):
-                if i + 1 < len(active_edges):  
-                    x_start = int(active_edges[i][0][0] + (y - active_edges[i][0][1]) *
-                                (active_edges[i][1][0] - active_edges[i][0][0]) /
-                                (active_edges[i][1][1] - active_edges[i][0][1]))
-                    x_end = int(active_edges[i + 1][0][0] + (y - active_edges[i + 1][0][1]) *
-                                (active_edges[i + 1][1][0] - active_edges[i + 1][0][0]) /
-                                (active_edges[i + 1][1][1] - active_edges[i + 1][0][1]))
+                active_edges.sort(key=lambda edge: (edge[0][0] + (edge[1][0] - edge[0][0]) *
+                                                (y - edge[0][1]) / (edge[1][1] - edge[0][1])))
 
-                # Pintar la línea horizontal entre los puntos de intersección
-                for x in range(x_start, x_end + 1):
-                    self.canvas.create_rectangle(x, y, x + 1, y + 1, fill=color, outline=color)
-                    #self.master.update()    
-            # Opcional: Pintar los píxeles individuales
-            # for x in range(x_start, x_end + 1):
-            #     self.draw_pixel(x, y, color=color)
+                for i in range(0, len(active_edges), 2):
+                    if i + 1 < len(active_edges):  
+                        x_start = int(active_edges[i][0][0] + (y - active_edges[i][0][1]) *
+                                    (active_edges[i][1][0] - active_edges[i][0][0]) /
+                                    (active_edges[i][1][1] - active_edges[i][0][1]))
+                        x_end = int(active_edges[i + 1][0][0] + (y - active_edges[i + 1][0][1]) *
+                                    (active_edges[i + 1][1][0] - active_edges[i + 1][0][0]) /
+                                    (active_edges[i + 1][1][1] - active_edges[i + 1][0][1]))
 
-    # Limpiar los bordes activos
-        active_edges.clear()
+                    # Pintar la línea horizontal entre los puntos de intersección
+                    for x in range(x_start, x_end + 1):
+                        self.canvas.create_rectangle(x, y, x + 1, y + 1, fill=color, outline=color)
+                        #self.master.update()    
+
+        # Limpiar los bordes activos
+            active_edges.clear()
 
     class Line():
         def __init__(self, canva) -> None:
@@ -600,7 +534,7 @@ class Gui:
                 else:
                     y -= 1
                     p = p + 2 * (x - y) + 1
-
+    
         def delete(self):
             self.draw(*self.puntos[0], *self.puntos[1],color="white", tipo="Normal", grosor=self.grosor)
 
