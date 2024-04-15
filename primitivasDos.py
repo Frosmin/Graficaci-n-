@@ -5,6 +5,8 @@ from tkinter import colorchooser, ttk, filedialog
 import math
 import time
 from PIL import Image, ImageTk , ImageGrab
+import tkinter.simpledialog as simpledialog
+
 
 class Gui:
     def __init__(self, master) -> None:
@@ -109,10 +111,33 @@ class Gui:
         #self.spb_grosor.bind('<<Increment o Decrement :v>>')
         
         
-        #Guardar imagen
-        self.boton_guardar = tk.Button(self.frame_options, text='Guardar', command=self.guardar_imagen)
-        self.boton_guardar.pack(side='left')
+        #escalar
+       #escalar
+        # self.entrada_sx = tk.Entry(self.frame_options)
+        # self.entrada_sx.pack(side='left')
+        # self.entrada_sy = tk.Entry(self.frame_options)
+        # self.entrada_sy.pack(side='left')
+        self.boton_escalar = tk.Button(self.frame_options, text='Escalar', command=lambda: self.escalar())
+        self.boton_escalar.pack(side='left')
+        
+        self.figuras = [] 
+        
+        self.boton_borrar = tk.Button(self.frame_options, text="Borrar", command=self.borrar)
+        self.boton_borrar.pack(side='left')
+        
+        self.xd = tk.Button(self.frame_options, text="verlista", command=self.ver_lista)
+        self.xd.pack(side='left')
+
+
+    def ver_lista(self):
+        for figura in self.figuras:
+            print(figura)    
     
+    
+    def borrar_ultimo(self):
+        if self.figuras:
+            self.figuras.pop()
+            self.redibujar()
     
     
     def guardar_imagen(self):
@@ -131,26 +156,43 @@ class Gui:
             self.puntos[i] = (self.puntos[i][0] + dx, self.puntos[i][1] + dy)
         self.redibujar()
 
-    def escalar(self, sx, sy):
-        for i in range(len(self.puntos)):
-            self.puntos[i] = (self.puntos[i][0] * sx, self.puntos[i][1] * sy)
-        self.redibujar()
-
-    def rotar(self, theta):
-        theta = math.radians(theta)
-        for i in range(len(self.puntos)):
-            x = self.puntos[i][0] * math.cos(theta) - self.puntos[i][1] * math.sin(theta)
-            y = self.puntos[i][0] * math.sin(theta) + self.puntos[i][1] * math.cos(theta)
-            self.puntos[i] = (x, y)
-        self.redibujar()
-
-    def redibujar(self):
-        self.canvas.delete('all')  # Elimina todos los elementos del lienzo
-        for punto in self.puntos:
-            x, y = punto
-            self.canvas.create_oval(x, y, x+1, y+1, fill=self.color.get())  # Dibuja un punto en el lienzo
         
-        
+    def escalar(self):
+        # Muestra una ventana emergente para obtener sx
+        sx = simpledialog.askfloat("Escalar", "Introduce el valor de sx")
+        if sx is None:  # Si el usuario canceló la ventana emergente
+            return
+
+        # Muestra una ventana emergente para obtener sy
+        sy = simpledialog.askfloat("Escalar", "Introduce el valor de sy")
+        if sy is None:  # Si el usuario canceló la ventana emergente
+            return
+
+        print(f"Escalar llamado con sx={sx}, sy={sy}")
+        if self.figuras:  # Comprueba si hay figuras en la lista
+            # Escala la última figura
+            figura = self.figuras[-1]
+            # Calcula el centro de la figura
+            cx = sum(punto[0] for punto in figura) / len(figura)
+            cy = sum(punto[1] for punto in figura) / len(figura)
+            # Aplica la escala con respecto al centro de la figura
+            self.figuras[-1] = [((punto[0] - cx) * sx + cx, (punto[1] - cy) * sy + cy) for punto in figura]
+            self.redibujar()
+
+    def borrar(self):
+        if self.figuras:  # Comprueba si hay figuras en la lista
+            # Elimina la última figura
+            self.figuras.pop()
+            # Guarda el color actual
+            color_actual = self.color.get()
+            # Cambia el color a blanco
+            self.color.set('white')
+            # Redibuja las figuras
+            self.redibujar()
+            # Restablece el color original
+            self.color.set(color_actual)
+    
+            
     def color_picker(self):
         self.color.set(colorchooser.askcolor()[1])
         if self.color.get() == 'None':
@@ -292,10 +334,7 @@ class Gui:
                 # Pintar la línea horizontal entre los puntos de intersección
                 for x in range(x_start, x_end + 1):
                     self.canvas.create_rectangle(x, y, x + 1, y + 1, fill=color, outline=color)
-                    #self.master.update()    
-            # Opcional: Pintar los píxeles individuales
-            # for x in range(x_start, x_end + 1):
-            #     self.draw_pixel(x, y, color=color)
+                
 
     # Limpiar los bordes activos
         active_edges.clear()
@@ -377,21 +416,6 @@ class Gui:
             x1, y1 = (x,y)
             x2, y2 = ((x+grosor), (y+grosor))
             self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, width=0)
-
-        def draw_circle_basic(self, xc, yc, r):
-            for x in range(xc - r, xc + r ):  #200 200 100      100, 100   
-                y_positivo = yc + int((r ** 2 - (x - xc) **  2) ** 0.5)
-                y_negativo = yc - int((r ** 2 - (x - xc) ** 2) ** 0.5)
-                self.draw_pixel(x, y_positivo)
-                self.draw_pixel(x, y_negativo)
-
-        def draw_circle_polar(self, xc, yc, r):
-            for i in range(360):
-                sin_values = r * math.sin(i * math.pi / 180)
-                cos_values = r * math.cos(i * math.pi / 180) 
-                x = xc + cos_values
-                y = yc + sin_values
-                self.draw_pixel(round(x), round(y))  
   
         def draw_circle_bresenham(self, x_center, y_center, r, color="black", tipo=0, grosor=1):
             def draw():
