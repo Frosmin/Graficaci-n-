@@ -111,33 +111,20 @@ class Gui:
         #self.spb_grosor.bind('<<Increment o Decrement :v>>')
         
         
-        #escalar
-       #escalar
-        # self.entrada_sx = tk.Entry(self.frame_options)
-        # self.entrada_sx.pack(side='left')
-        # self.entrada_sy = tk.Entry(self.frame_options)
-        # self.entrada_sy.pack(side='left')
-        self.boton_escalar = tk.Button(self.frame_options, text='Escalar', command=lambda: self.escalar())
-        self.boton_escalar.pack(side='left')
-        
-        self.figuras = [] 
-        
-        self.boton_borrar = tk.Button(self.frame_options, text="Borrar", command=self.borrar)
-        self.boton_borrar.pack(side='left')
-        
-        self.xd = tk.Button(self.frame_options, text="verlista", command=self.ver_lista)
-        self.xd.pack(side='left')
+        #Guardar imagen
+        self.boton_guardar = tk.Button(self.frame_options, text='Guardar', command=self.guardar_imagen)
+        self.boton_guardar.pack(side='left')
 
+    def is_inside_triangle(self, x, y, p1, p2, p3):
+        # Verifica si el punto (x, y) está dentro del triángulo formado por p1, p2 y p3
+        def sign(p1, p2, p3):
+            return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
 
-    def ver_lista(self):
-        for figura in self.figuras:
-            print(figura)    
-    
-    
-    def borrar_ultimo(self):
-        if self.figuras:
-            self.figuras.pop()
-            self.redibujar()
+        b1 = sign((x, y), p1, p2) < 0
+        b2 = sign((x, y), p2, p3) < 0
+        b3 = sign((x, y), p3, p1) < 0
+
+        return ((b1 == b2) and (b2 == b3))
     
     
     def guardar_imagen(self):
@@ -286,6 +273,7 @@ class Gui:
         linea.draw_line_bresenham(*p1,*p2, color=self.color.get(), tipo=self.tipo.get(), grosor=self.spn_int.get())
         linea.draw_line_bresenham(*p2,*p3, color=self.color.get(), tipo=self.tipo.get(), grosor=self.spn_int.get())
         linea.draw_line_bresenham(*p3,*p1, color=self.color.get(), tipo=self.tipo.get(), grosor=self.spn_int.get())
+
     def show_popup_menu(self, event):
         menu = tk.Menu(self.master, tearoff=0)
         menu.add_command(label="Rellenar Triangulo", command=self.rellenar_triangulo)
@@ -320,7 +308,9 @@ class Gui:
                     active_edges.append(edge)
 
             active_edges.sort(key=lambda edge: (edge[0][0] + (edge[1][0] - edge[0][0]) *
-                                             (y - edge[0][1]) / (edge[1][1] - edge[0][1])))
+                                                (y - edge[0][1]) / (edge[1][1] - edge[0][1])))
+
+            intersections = []
 
             for i in range(0, len(active_edges), 2):
                 if i + 1 < len(active_edges):  
@@ -331,13 +321,23 @@ class Gui:
                                 (active_edges[i + 1][1][0] - active_edges[i + 1][0][0]) /
                                 (active_edges[i + 1][1][1] - active_edges[i + 1][0][1]))
 
-                # Pintar la línea horizontal entre los puntos de intersección
-                for x in range(x_start, x_end + 1):
-                    self.canvas.create_rectangle(x, y, x + 1, y + 1, fill=color, outline=color)
-                
+                # Agregar los puntos de intersección a la lista
+                    intersections.extend(range(x_start, x_end + 1))
 
-    # Limpiar los bordes activos
-        active_edges.clear()
+        # Calcular el grosor de la línea
+            grosor = self.spn_int.get()
+
+        # Determinar los puntos de inicio y fin del segmento de línea interior del triángulo
+        #if intersections:
+            start_point = min(intersections) + (grosor // 2)
+            end_point = max(intersections) - (grosor // 2)
+
+        # Pintar los píxeles dentro del segmento de línea interior del triángulo
+            for x in range(start_point+4, end_point+2 ):
+            #for x in range(start_point, end_point + 1):
+                self.canvas.create_rectangle(x, y, x + 1, y + 1, fill=color, outline=color)
+
+
     class Line():
         def __init__(self, canva) -> None:
             self.canvas = canva
