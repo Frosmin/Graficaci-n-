@@ -28,65 +28,87 @@ class Circle:
 
     # def draw_circle_bresenham
     def draw(self, imagen):
-
-        def drawOctantes():
+        
+        def drawOctantes(colorrrr):
             self.draw_pixel(
                 imagen,
                 self.centro[0] + x,
                 self.centro[1] + y,
-                color=self.colorBorde,
+                color=colorrrr,
                 grosor=self.bordeAncho,
             )
             self.draw_pixel(
                 imagen,
                 self.centro[0] - x,
                 self.centro[1] + y,
-                color=self.colorBorde,
+                color=colorrrr,
                 grosor=self.bordeAncho,
             )
             self.draw_pixel(
                 imagen,
                 self.centro[0] + x,
                 self.centro[1] - y,
-                color=self.colorBorde,
+                color=colorrrr,
                 grosor=self.bordeAncho,
             )
             self.draw_pixel(
                 imagen,
                 self.centro[0] - x,
                 self.centro[1] - y,
-                color=self.colorBorde,
+                color=colorrrr,
                 grosor=self.bordeAncho,
             )
             self.draw_pixel(
                 imagen,
                 self.centro[0] + y,
                 self.centro[1] + x,
-                color=self.colorBorde,
+                color=colorrrr,
                 grosor=self.bordeAncho,
             )
             self.draw_pixel(
                 imagen,
                 self.centro[0] - y,
                 self.centro[1] + x,
-                color=self.colorBorde,
+                color=colorrrr,
                 grosor=self.bordeAncho,
             )
             self.draw_pixel(
                 imagen,
                 self.centro[0] + y,
                 self.centro[1] - x,
-                color=self.colorBorde,
+                color=colorrrr,
                 grosor=self.bordeAncho,
             )
             self.draw_pixel(
                 imagen,
                 self.centro[0] - y,
                 self.centro[1] - x,
-                color=self.colorBorde,
+                color=colorrrr,
                 grosor=self.bordeAncho,
             )
 
+        
+        if self.isFilled:
+            x = 0
+            y = self.radio * self.escala
+            p = 1 - self.radio
+
+            while x <= y:
+                drawOctantes(self.colorRelleno)
+                x += 1
+                if p <= 0:
+                    p = p + 2 * x + 1
+                else:
+                    y -= 1
+                    p = p + 2 * (x - y) + 1
+            # self.floodFill()
+            self.flood_fill(
+                imagen,
+                self.centro[0],
+                self.centro[1],
+                self.colorRelleno,
+                self.colorBorde,
+            )
         x = 0
         y = self.radio * self.escala
         p = 1 - self.radio
@@ -96,10 +118,10 @@ class Circle:
                 if self.segment == 0:
                     self.segment = 15
                 if self.segment > 5:
-                    drawOctantes()
+                    drawOctantes(self.colorBorde)
                 self.segment -= 1
             else:
-                drawOctantes()
+                drawOctantes(self.colorBorde)
 
             x += 1
             if p <= 0:
@@ -107,15 +129,6 @@ class Circle:
             else:
                 y -= 1
                 p = p + 2 * (x - y) + 1
-        # self.floodFill()
-        if self.isFilled:
-            self.flood_fill(
-                imagen,
-                self.centro[0],
-                self.centro[1],
-                self.colorRelleno,
-                self.colorBorde,
-            )
 
     def delete(self):
         self.draw(
