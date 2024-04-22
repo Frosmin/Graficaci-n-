@@ -2,6 +2,7 @@ import math
 
 class Triangulo():
     def __init__(self, canvas, id, colorRelleno, colorBorde, tipoBorde, bordeAncho, puntos) -> None:
+        self.isFilled = False
         self.canvas = canvas
         self.id = id
         self.colorRelleno = colorRelleno
@@ -52,7 +53,8 @@ class Triangulo():
         puntosEscala = self._escalar()
         nuevosPuntos = self._rotar(puntosEscala)
         
-        self.scanline(nuevosPuntos)
+        if self.isFilled:
+            self.scanline(nuevosPuntos)
     
         self.bresenham(*nuevosPuntos[0], *nuevosPuntos[1], self.colorBorde)
         self.bresenham(*nuevosPuntos[1], *nuevosPuntos[2], self.colorBorde)

@@ -3,6 +3,7 @@ import math
 class Line():
     #def __init__(self, canva, id, colorRelleno, colorBorde, tipoBorde, bordeAncho, centro, radio) -> None:
     def __init__(self, canva, id, colorBorde, tipoBorde, bordeAncho, puntoInicio, puntoFinal) -> None:
+        self.isFilled = False
         self.canvas = canva
         self.id = id
         self.colorBorde = colorBorde

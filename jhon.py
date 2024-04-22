@@ -425,6 +425,12 @@ class Gui:
         else:
             print("no hay elemento seleccionado")
 
+    def cambiarRelleno(self, isFilled):
+        if self.current_object:
+            self.current_object.isFilled = isFilled
+            self.canvas.delete("all")
+            self.drawAll()
+        
     def show_popup_menu(self, event):
         self.context_menu_x = event.x
         self.context_menu_y = event.y
@@ -432,11 +438,14 @@ class Gui:
         menu.add_command(label="Mover", command=self.set_mover)
         menu.add_command(label="Rotar", command=self.set_rotar)
         menu.add_command(label="Escala", command=self.set_escala)
-        menu.add_command(label="Actualizar elemento", command=self.update_element)
+        #menu.add_command(label="Actualizar elemento", command=self.update_element)
+        menu.add_command(label="Rellenar", command=lambda: self.cambiarRelleno(True))
+        menu.add_command(label="Quitar relleno", command=lambda: self.cambiarRelleno(False))
         menu.add_command(label="Eliminar elemento", command=self.delete)
-        menu.add_command(label="Save", command= self.guardar_imagen)
-        menu.add_command(label="Limpiar", command=lambda: self.canvas.delete('all'))
+        menu.add_command(label="Guardar imagen", command= self.guardar_imagen)
+        menu.add_command(label="Limpiar canvas", command=lambda: self.canvas.delete('all'))
         menu.post(event.x_root, event.y_root)
+
 
     def mover(self):
         if self.current_object:

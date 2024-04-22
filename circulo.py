@@ -2,6 +2,7 @@ from PIL import ImageGrab, Image
 import tkinter as tk
 class Circle():
     def __init__(self, canva, id, colorRelleno, colorBorde, tipoBorde, bordeAncho, centro, radio) -> None:
+        self.isFilled = False
         self.canvas = canva
         self.segment = 15
         self.puntos = list()
@@ -24,7 +25,8 @@ class Circle():
   
     # def draw_circle_bresenham 
     def draw(self):
-        self.flood_fill_circle()
+        if self.isFilled:
+            self.flood_fill_circle()
         def drawOctantes():
             self.draw_pixel(self.centro[0] + x, self.centro[1] + y, color=self.colorBorde, grosor=self.bordeAncho)
             self.draw_pixel(self.centro[0] - x, self.centro[1] + y, color=self.colorBorde, grosor=self.bordeAncho)
