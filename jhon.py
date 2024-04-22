@@ -191,6 +191,9 @@ class Gui:
             rutaCorregida = os.path.normpath(ruta)
             print("Imagen guardada en carpeta:", rutaCorregida)
             subprocess.Popen(f'explorer /select,"{rutaCorregida}"')
+            
+            im = Image.open(ruta)
+            im.show()
 
     def handle_click(self, event):
         x , y = event.x, event.y
