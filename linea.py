@@ -48,8 +48,6 @@ class Line:
 
     # def draw_line_bresenham
     def draw(self, imagen):
-        print("que pasasassasasdasda")
-        print(self.colorBorde)
         grosor = self.bordeAncho
 
         puntosEscalados = self._escalar()
@@ -68,10 +66,10 @@ class Line:
                 if self.segment == 0:
                     self.segment = 15
                 if self.segment > 5:
-                    self.draw_pixel(imagen, x0, y0, self.colorBorde, grosor)
+                    self.draw_pixel(imagen, x0, y0, self.colorBorde)
                 self.segment -= 1
             else:
-                self.draw_pixel(imagen, x0, y0, self.colorBorde, grosor)
+                self.draw_pixel(imagen, x0, y0, self.colorBorde)
             e2 = 2 * err
             if e2 > -dy:
                 err -= dy

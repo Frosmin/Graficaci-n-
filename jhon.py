@@ -190,7 +190,7 @@ class Gui:
             print("Imagen guardada en:", ruta)
             rutaCorregida = os.path.normpath(ruta)
             print("Imagen guardada en carpeta:", rutaCorregida)
-            subprocess.Popen(f'explorer /select,"{rutaCorregida}"')
+            #subprocess.Popen(f'explorer /select,"{rutaCorregida}"')
             
             im = Image.open(ruta)
             im.show()
