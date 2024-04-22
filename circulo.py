@@ -8,7 +8,7 @@ class Circle:
     ) -> None:
         self.isFilled = False
         self.canvas = canva
-        self.segment = 15
+        self.segment = 30
         self.puntos = list()
         self.id = id
         self.grosor = 1
@@ -23,12 +23,19 @@ class Circle:
 
     # TODO agregar el grosor de borde PRIORITY:HIGH
     def draw_pixel(self, imagen, x, y, color="#000000", grosor=1):
+        
         if 0 <= x < 700 and 0 <= y < 600:
-            imagen.putpixel((int(x), int(y)), self.hex_to_rgb(color))
+            suma = 0 if (grosor%2==0) else 1
+            half_thickness = int(grosor // 2)
+            for dx in range(-half_thickness, half_thickness + suma):
+                for dy in range(-half_thickness, half_thickness + suma):
+                    #draw.line([(x + dx, y + dy), (x + dx + 1, y + dy + 1)], fill=color, width=1)
+                    if ((0 < x < 700) and (0 < y < 700)):
+                        imagen.putpixel((int(x + dx), int(y + dy)), self.hex_to_rgb(color))
 
     # def draw_circle_bresenham
     def draw(self, imagen):
-        
+        self.segment = 20
         def drawOctantes(colorrrr):
             self.draw_pixel(
                 imagen,
@@ -116,8 +123,8 @@ class Circle:
         while x <= y:
             if self.tipoBorde == "Segmentado":
                 if self.segment == 0:
-                    self.segment = 15
-                if self.segment > 5:
+                    self.segment = 20
+                if self.segment > 12:
                     drawOctantes(self.colorBorde)
                 self.segment -= 1
             else:
@@ -156,34 +163,23 @@ class Circle:
     def rotar(self, angulo):
         self.angulo = angulo
 
-    # TODO
-    def floodFill(self):
-        photo_image = tk.PhotoImage(
-            master=self.canvas,
-            width=self.canvas.winfo_reqwidth(),
-            height=self.canvas.winfo_reqheight(),
-        )
-        x = 10  # Ejemplo: coordenada x
-        y = 20  # Ejemplo: coordenada y
-        color = photo_image.get(x, y)
-        print("Color en la posición ({}, {}): {}".format(x, y, color))
 
     # esto no es flood fill xd
-    def flood_fill_circle(self):
-        radio = self.radio * self.escala
-        for y in range(round(self.centro[1] - radio), round(self.centro[1] + radio)):
-            for x in range(
-                round(self.centro[0] - radio), round(self.centro[0] + radio)
-            ):
-                if (x - self.centro[0]) ** 2 + (y - self.centro[1]) ** 2 <= radio**2:
-                    self.canvas.create_rectangle(
-                        x,
-                        y,
-                        x + 1,
-                        y + 1,
-                        fill=self.colorRelleno,
-                        outline=self.colorRelleno,
-                    )
+    # def flood_fill_circle(self):
+    #     radio = self.radio * self.escala
+    #     for y in range(round(self.centro[1] - radio), round(self.centro[1] + radio)):
+    #         for x in range(
+    #             round(self.centro[0] - radio), round(self.centro[0] + radio)
+    #         ):
+    #             if (x - self.centro[0]) ** 2 + (y - self.centro[1]) ** 2 <= radio**2:
+    #                 self.canvas.create_rectangle(
+    #                     x,
+    #                     y,
+    #                     x + 1,
+    #                     y + 1,
+    #                     fill=self.colorRelleno,
+    #                     outline=self.colorRelleno,
+    #                 )
 
     def flood_fill(self, imagen, xi, yi, fill_color, border_color):
         stack = [(xi, yi)]

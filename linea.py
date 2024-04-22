@@ -74,9 +74,11 @@ class Line:
             if e2 > -dy:
                 err -= dy
                 x0 += sx
+                
             if e2 < dx:
                 err += dx
                 y0 += sy
+               
 
     def trasladar(self, fromCords, toCords):
         print(f"de {fromCords} hasta {toCords}")
