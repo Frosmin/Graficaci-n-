@@ -14,7 +14,7 @@ class Triangulo():
         self.escala = 1
         self.angulo = 0
         self.segment = 8
-        
+    
     def trasladar(self, fromCords, toCords):
         x1, y1 = fromCords
         x2, y2 = toCords
@@ -49,23 +49,22 @@ class Triangulo():
 
         return puntos_finales
 
-    def draw(self):
+    def draw(self, imagen):
         puntosEscala = self._escalar()
         nuevosPuntos = self._rotar(puntosEscala)
         
         if self.isFilled:
-            self.scanline(nuevosPuntos)
+            self.scanline(imagen, nuevosPuntos)
     
-        self.bresenham(*nuevosPuntos[0], *nuevosPuntos[1], self.colorBorde)
-        self.bresenham(*nuevosPuntos[1], *nuevosPuntos[2], self.colorBorde)
-        self.bresenham(*nuevosPuntos[2], *nuevosPuntos[0], self.colorBorde)
+        self.bresenham(imagen, *nuevosPuntos[0], *nuevosPuntos[1], self.colorBorde)
+        self.bresenham(imagen, *nuevosPuntos[1], *nuevosPuntos[2], self.colorBorde)
+        self.bresenham(imagen, *nuevosPuntos[2], *nuevosPuntos[0], self.colorBorde)
         
-    def draw_pixel(self, x, y, color="#000000", grosor=1):
-        x1, y1 = (x,y)
-        x2, y2 = ((x+grosor), (y+grosor))
-        self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, width=0)        
+    def draw_pixel(self, imagen, x, y, color="#000000", grosor=1):
+        if 0 <= x < 700 and 0 <= y < 600:
+            imagen.putpixel((int(x), int(y)), self.hex_to_rgb(color))      
 
-    def bresenham(self, x0, y0, x1, y1, color):
+    def bresenham(self, imagen, x0, y0, x1, y1, color):
         dx = abs(x1 - x0) 
         dy = abs(y1 - y0) 
         sx = -1 if x0 > x1 else 1
@@ -75,10 +74,10 @@ class Triangulo():
             if self.tipoBorde == "Segmentado":
                 if self.segment == 0: self.segment = 15
                 if self.segment > 5:
-                    self.draw_pixel(x0, y0, color, self.bordeAncho)
+                    self.draw_pixel(imagen, x0, y0, color, self.bordeAncho)
                 self.segment-=1
             else:
-                self.draw_pixel(x0, y0, color, self.bordeAncho)
+                self.draw_pixel(imagen, x0, y0, color, self.bordeAncho)
             e2 = 2 * err
             if e2 > -dy:
                 err -= (dy)
@@ -87,14 +86,14 @@ class Triangulo():
                 err += (dx)
                 y0 += (sy)
                 
-    def bresenhamSinSegmentadoXD(self, x0, y0, x1, y1, color):
+    def bresenhamSinSegmentadoXD(self, imagen, x0, y0, x1, y1, color):
         dx = abs(x1 - x0) 
         dy = abs(y1 - y0) 
         sx = -1 if x0 > x1 else 1
         sy = -1 if y0 > y1 else 1
         err = dx - dy
         while x0 != x1 or y0 != y1:
-            self.draw_pixel(x0, y0, color)
+            self.draw_pixel(imagen, x0, y0, color)
             e2 = 2 * err
             if e2 > -dy:
                 err -= (dy)
@@ -128,7 +127,7 @@ class Triangulo():
         # Actualizar los puntos del triángulo
         return puntos_finales
     
-    def scanline(self, puntosNuevos):
+    def scanline(self, imagen, puntosNuevos):
         # Encontrar los límites del triángulo en y
         min_y = min(pt[1] for pt in puntosNuevos)
         max_y = max(pt[1] for pt in puntosNuevos)
@@ -152,8 +151,25 @@ class Triangulo():
             for i in range(0, len(intersecciones), 2):
                 x0 = int(intersecciones[i])
                 x1 = int(intersecciones[i + 1])
-                self.bresenhamSinSegmentadoXD(x0, y, x1, y, self.colorRelleno)
+                self.bresenhamSinSegmentadoXD(imagen, x0, y, x1, y, self.colorRelleno)
 
+    def hex_to_rgb(self, hex_color):
+        # Eliminar el caracter '#' si está presente
+        hex_color = hex_color.lstrip('#')
+        
+        # Verificar si el color es un formato válido de 3 o 6 caracteres
+        if len(hex_color) == 3:
+            r = int(hex_color[0] * 2, 16)
+            g = int(hex_color[1] * 2, 16)
+            b = int(hex_color[2] * 2, 16)
+        elif len(hex_color) == 6:
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+        else:
+            raise ValueError("Formato de color hexadecimal inválido.")
+        
+        return (r, g, b)
     
     def __str__(self) -> str:
         return f"Hola soy el triangulo {self.id}"

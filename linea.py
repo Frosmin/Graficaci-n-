@@ -15,13 +15,11 @@ class Line():
         self.escala = 1
         self.angulo = 0
     
-    def draw_pixel(self, x, y, color="black", grosor=1):
-        x1, y1 = (x,y)
-        x2, y2 = ((x+grosor), (y+grosor))
-        self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, width=0)
-    
+    def draw_pixel(self, imagen, x, y, color="black", grosor=1):
+        if 0 <= x < 700 and 0 <= y < 600:
+            imagen.putpixel((int(x), int(y)), self.hex_to_rgb(color))
     # def draw_line_bresenham
-    def draw(self):
+    def draw(self, imagen):
         grosor = self.bordeAncho
         
         puntosEscalados = self._escalar()
@@ -40,10 +38,10 @@ class Line():
             if self.tipoBorde == "Segmentado":
                 if self.segment == 0: self.segment = 15
                 if self.segment > 5:
-                    self.draw_pixel(x0, y0, color=self.colorBorde, grosor=grosor)
+                    self.draw_pixel(imagen, x0, y0, color=self.colorBorde, grosor=grosor)
                 self.segment-=1
             else:
-                self.draw_pixel(x0, y0, color=self.colorBorde, grosor=grosor)
+                self.draw_pixel(imagen, x0, y0, color=self.colorBorde, grosor=grosor)
             e2 = 2 * err
             if e2 > -dy:
                 err -= (dy)
@@ -97,6 +95,24 @@ class Line():
         puntoFinalRotado = (int(x1_rotado + x0), int(y1_rotado + y0))
         
         return [puntoInicioRotado, puntoFinalRotado]
+    
+    def hex_to_rgb(self, hex_color):
+        # Eliminar el caracter '#' si está presente
+        hex_color = hex_color.lstrip('#')
+        
+        # Verificar si el color es un formato válido de 3 o 6 caracteres
+        if len(hex_color) == 3:
+            r = int(hex_color[0] * 2, 16)
+            g = int(hex_color[1] * 2, 16)
+            b = int(hex_color[2] * 2, 16)
+        elif len(hex_color) == 6:
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+        else:
+            raise ValueError("Formato de color hexadecimal inválido.")
+        
+        return (r, g, b)
     
     def __str__(self) -> str:
         return f"Hola soy la linea {self.id} ✋"

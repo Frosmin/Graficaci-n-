@@ -1,12 +1,13 @@
 import colorsys
 import copy
+import subprocess
 from circulo import Circle
 from triangulo import Triangulo
 from linea import Line
 
 import customtkinter as ctk
 import tkinter as tk
-from tkinter import colorchooser
+from tkinter import NW, colorchooser
 import math
 from PIL import Image, ImageGrab, ImageTk
 import os
@@ -163,26 +164,33 @@ class Gui:
 
         # Crear un lienzo (canvas)
         self.canvas = ctk.CTkCanvas(self.frame_canva, width=700, height=600)
-        self.canvas.pack()
-        self.canvas.config(bg="#ffffff")
 
+        #self.canvas.config(bg="#ffffff")
+
+        # imagen donde dibujaremos todo
+        self.imagen = Image.new("RGB", (700, 600), color=(255, 255, 255))
+        self.imagen_tk = ImageTk.PhotoImage(self.imagen)
+        self.canvas.create_image(0, 0, anchor=NW, image=self.imagen_tk)
+        self.canvas.pack()
+        
+        # actualizar la imagen
+        #self.imagen_tk.paste(self.imagen)
+        #self.canvas.update()
         # Eventos
         self.canvas.bind('<Button-1>', self.handle_click)
         self.master.bind('<Escape>', self.event_scape)
         self.canvas.bind("<Button-3>", self.show_popup_menu)
 
     def guardar_imagen(self):
-        ruta = tk.filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg")])
+        ruta = tk.filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
         if ruta:
-        # Captura la pantalla del lienzo y guarda la imagen
-            x = self.master.winfo_rootx() + self.frame_canva.winfo_x()
-            y = self.master.winfo_rooty() + self.frame_canva.winfo_y()
-            x1 = x + self.frame_canva.winfo_width()
-            y1 = y + self.frame_canva.winfo_height()
-            ImageGrab.grab().crop((x, y, x1, y1)).save(ruta)
-            image = Image.open(f'{ruta}')
-            print(os.path.basename(ruta))
-            image.show(title=f'{os.path.basename(ruta)}')
+            if self.imagen.mode != "RGB":
+                self.imagen = self.imagen.convert("RGB")
+            self.imagen.save(ruta, format="PNG")
+            print("Imagen guardada en:", ruta)
+            rutaCorregida = os.path.normpath(ruta)
+            print("Imagen guardada en carpeta:", rutaCorregida)
+            subprocess.Popen(f'explorer /select,"{rutaCorregida}"')
 
     def handle_click(self, event):
         x , y = event.x, event.y
@@ -327,7 +335,9 @@ class Gui:
             self.puntos[1]
         ) 
         
-        linea.draw()
+        linea.draw(self.imagen)
+        self.imagen_tk.paste(self.imagen)
+        self.canvas.update()
         
         self.lista_elementos.append(linea)
         self.lista_elementos_nombre.append(linea.id)
@@ -350,8 +360,10 @@ class Gui:
         )
         
         #circulo.save_puntos(*p1,*p2)
-        circulo.draw()
-
+        circulo.draw(self.imagen)
+        self.imagen_tk.paste(self.imagen)
+        self.canvas.update()
+        
         self.lista_elementos.append(circulo)
         self.lista_elementos_nombre.append(circulo.id)
 
@@ -370,7 +382,9 @@ class Gui:
             copy.deepcopy(self.puntos)
         )
         
-        triangulo.draw()
+        triangulo.draw(self.imagen)
+        self.imagen_tk.paste(self.imagen)
+        self.canvas.update()
         
         self.lista_elementos.append(triangulo)
         self.lista_elementos_nombre.append(triangulo.id)
@@ -391,25 +405,24 @@ class Gui:
                 self.current_object.colorBorde = self.colorBorde.get()
                 self.current_object.tipoBorde = self.cmb_tipo.get()
                 self.current_object.bordeAncho = int(self.slider_grosor.get())
-                self.canvas.delete("all")
-                self.drawAll()
             elif isinstance(self.current_object, Circle):
                 self.current_object.tipoBorde = self.cmb_tipo.get()
                 self.current_object.colorRelleno = self.color.get()
                 self.current_object.colorBorde = self.colorBorde.get()
                 self.current_object.bordeAncho = int(self.slider_grosor.get())
-                self.canvas.delete("all")
-                self.drawAll()
             elif isinstance(self.current_object, Line):
                 self.current_object.colorBorde = self.colorBorde.get(),
                 self.current_object.tipoBorde = self.cmb_tipo.get(),
                 self.current_object.bordeAncho = int(self.slider_grosor.get())
-                self.canvas.delete("all")
-                self.drawAll()
+                #reset a la imagen
+            self.imagen = Image.new("RGB", (700, 600), color=(255, 255, 255))
+            self.drawAll()
+            self.imagen_tk.paste(self.imagen)
+            self.canvas.update()
     
     def drawAll(self):
         for elemento in self.lista_elementos:
-            elemento.draw()
+            elemento.draw(self.imagen)
 
     def delete(self):
         if self.current_object:
@@ -421,16 +434,26 @@ class Gui:
             self.cmb_elementos.set(value="")
             self.cmb_elementos.configure(values=self.lista_elementos_nombre)
             self.current_object = None
-            #TODO redibujar todo el canvas
+            self.imagen = Image.new("RGB", (700, 600), color=(255, 255, 255))
+            self.drawAll()
+            self.imagen_tk.paste(self.imagen)
+            self.canvas.update()
         else:
             print("no hay elemento seleccionado")
 
     def cambiarRelleno(self, isFilled):
         if self.current_object:
             self.current_object.isFilled = isFilled
-            self.canvas.delete("all")
+
+            self.imagen = Image.new("RGB", (700, 600), color=(255, 255, 255))
             self.drawAll()
-        
+            self.imagen_tk.paste(self.imagen)
+            self.canvas.update()
+    def limpiarTodo(self):
+        self.imagen = Image.new("RGB", (700, 600), color=(255, 255, 255))
+        self.imagen_tk.paste(self.imagen)
+        self.canvas.update()
+
     def show_popup_menu(self, event):
         self.context_menu_x = event.x
         self.context_menu_y = event.y
@@ -443,29 +466,35 @@ class Gui:
         menu.add_command(label="Quitar relleno", command=lambda: self.cambiarRelleno(False))
         menu.add_command(label="Eliminar elemento", command=self.delete)
         menu.add_command(label="Guardar imagen", command= self.guardar_imagen)
-        menu.add_command(label="Limpiar canvas", command=lambda: self.canvas.delete('all'))
+        menu.add_command(label="Limpiar canvas", command=self.limpiarTodo)
         menu.post(event.x_root, event.y_root)
 
 
     def mover(self):
         if self.current_object:
             self.current_object.trasladar(self.puntos[0],self.puntos[1])
-            self.canvas.delete("all")
+            self.imagen = Image.new("RGB", (700, 600), color=(255, 255, 255))
             self.drawAll()
+            self.imagen_tk.paste(self.imagen)
+            self.canvas.update()
 
     def escala(self):
         pivot = self.puntos[0]
         if self.current_object:
             self.current_object.escalar(self.n_escala)
-            self.canvas.delete("all")
+            self.imagen = Image.new("RGB", (700, 600), color=(255, 255, 255))
             self.drawAll()
+            self.imagen_tk.paste(self.imagen)
+            self.canvas.update()
     
     def rotar(self):
         pivot = self.puntos[0]
         if self.current_object:
             self.current_object.rotar(self.theta_rotacion)
-            self.canvas.delete("all")
+            self.imagen = Image.new("RGB", (700, 600), color=(255, 255, 255))
             self.drawAll()
+            self.imagen_tk.paste(self.imagen)
+            self.canvas.update()
        
     def distancia_entre_puntos(self, x1, y1, x2, y2):
         distancia = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
