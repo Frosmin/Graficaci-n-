@@ -97,7 +97,7 @@ class Circle:
         
         if self.isFilled:
             x = 0
-            y = self.radio * self.escala
+            y = self.radio
             p = 1 - self.radio
 
             while x <= y:
@@ -117,7 +117,7 @@ class Circle:
                 self.colorBorde,
             )
         x = 0
-        y = self.radio * self.escala
+        y = self.radio
         p = 1 - self.radio
 
         while x <= y:
@@ -159,6 +159,7 @@ class Circle:
 
     def escalar(self, escala):
         self.escala = escala
+        self.radio = int (self.radio * self.escala)
 
     def rotar(self, angulo):
         self.angulo = angulo

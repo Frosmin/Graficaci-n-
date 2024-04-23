@@ -26,9 +26,13 @@ class Triangulo():
 
     def escalar(self, escala):
         self.escala = escala
+        puntosEscala = self._escalar()
+        self.puntos = puntosEscala
     
     def rotar(self, angulo):
         self.angulo = angulo
+        nuevosPuntos = self._rotar(self.puntos)
+        self.puntos = nuevosPuntos
 
     def _escalar(self):
         # Calcular el punto de anclaje (primer punto)
@@ -40,7 +44,7 @@ class Triangulo():
         # Escalar los puntos
         puntos_escala = []
         for x, y in puntos_locales:
-            puntos_escala.append((x * self.escala, y * self.escala))
+            puntos_escala.append((int(x * self.escala),int( y * self.escala)))
 
         # Devolver los puntos a sus coordenadas originales
         puntos_finales = []
@@ -51,9 +55,7 @@ class Triangulo():
 
     def draw(self, imagen):
         self.segment = 8
-        puntosEscala = self._escalar()
-        nuevosPuntos = self._rotar(puntosEscala)
-        
+        nuevosPuntos = self.puntos
         if self.isFilled:
             self.scanline(imagen, nuevosPuntos)
     

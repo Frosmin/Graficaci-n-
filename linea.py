@@ -55,12 +55,8 @@ class Line:
     def draw(self, imagen):
         self.segment = 15
         grosor = self.bordeAncho
-
-        puntosEscalados = self._escalar()
-        puntosRotados = self._rotar(puntosEscalados)
-
-        x0, y0 = puntosRotados[0]
-        x1, y1 = puntosRotados[1]
+        x0, y0 = self.puntoInicio
+        x1, y1 = self.puntoFinal
 
         dx = abs(x1 - x0)
         dy = abs(y1 - y0)
@@ -68,7 +64,7 @@ class Line:
         sy = -1 if y0 > y1 else 1
         err = dx - dy
         while x0 != x1 or y0 != y1:
-            print(self.tipoBorde)
+
             if self.tipoBorde == "Segmentado" or self.tipoBorde[0] == "Segmentado": # odio mi vida
                 if self.segment == 0:
                     self.segment = 15
@@ -101,6 +97,11 @@ class Line:
 
     def escalar(self, escala):
         self.escala = escala
+        puntosEscalados = self._escalar()
+        self.puntoInicio = puntosEscalados[0]
+        self.puntoFinal = puntosEscalados[1]
+        #puntosRotados = self._rotar(puntosEscalados)
+
 
     def _escalar(self):
         x0, y0 = self.puntoInicio
@@ -108,13 +109,16 @@ class Line:
         # Escalar los puntos de inicio y final de la línea y devolver nueva lista
         puntoInicioEscalado = (x0, y0)
         puntoFinalEscalado = (
-            ((x1 - x0) * self.escala) + x0,
-            ((y1 - y0) * self.escala) + y0,
+            int(((x1 - x0) * self.escala) + x0),
+            int(((y1 - y0) * self.escala) + y0),
         )
         return [puntoInicioEscalado, puntoFinalEscalado]
 
     def rotar(self, angulo):
         self.angulo = angulo
+        puntosRotados = self._rotar([self.puntoInicio, self.puntoFinal])
+        self.puntoInicio = puntosRotados[0]
+        self.puntoFinal = puntosRotados[1]
 
     def _rotar(self, puntosEscalados):
         x0, y0 = puntosEscalados[0]
