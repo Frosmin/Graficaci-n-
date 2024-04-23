@@ -406,19 +406,16 @@ class Gui:
             if isinstance(self.current_object, Triangulo):
                 self.current_object.colorRelleno = self.color.get()
                 self.current_object.colorBorde = self.colorBorde.get()
-                self.current_object.tipoBorde = self.cmb_tipo.get()
+                self.current_object.tipoBorde = self.cmb_str.get()
                 self.current_object.bordeAncho = int(self.slider_grosor.get())
             elif isinstance(self.current_object, Circle):
-                self.current_object.tipoBorde = self.cmb_tipo.get()
+                self.current_object.tipoBorde = self.cmb_str.get()
                 self.current_object.colorRelleno = self.color.get()
                 self.current_object.colorBorde = self.colorBorde.get()
                 self.current_object.bordeAncho = int(self.slider_grosor.get())
             elif isinstance(self.current_object, Line):
-                print("prueba para el color de la lienaaaaaa")
-                print(self.color.get())
-            
                 self.current_object.colorBorde = str(self.colorBorde.get()),
-                self.current_object.tipoBorde = self.cmb_tipo.get(),
+                self.current_object.tipoBorde = self.cmb_str.get(),
                 self.current_object.bordeAncho = int(self.slider_grosor.get())
                 #reset a la imagen
             self.imagen = Image.new("RGB", (700, 600), color=(255, 255, 255))

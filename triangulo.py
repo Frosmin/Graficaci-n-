@@ -50,6 +50,7 @@ class Triangulo():
         return puntos_finales
 
     def draw(self, imagen):
+        self.segment = 8
         puntosEscala = self._escalar()
         nuevosPuntos = self._rotar(puntosEscala)
         
@@ -62,7 +63,13 @@ class Triangulo():
         
     def draw_pixel(self, imagen, x, y, color="#000000", grosor=1):
         if 0 <= x < 700 and 0 <= y < 600:
-            imagen.putpixel((int(x), int(y)), self.hex_to_rgb(color))      
+            suma = 0 if (grosor%2==0) else 1
+            half_thickness = int(grosor // 2)
+            for dx in range(-half_thickness, half_thickness + suma):
+                for dy in range(-half_thickness, half_thickness + suma):
+                    #draw.line([(x + dx, y + dy), (x + dx + 1, y + dy + 1)], fill=color, width=1)
+                    if ((0 < x < 700) and (0 < y < 700)):
+                        imagen.putpixel((int(x + dx), int(y + dy)), self.hex_to_rgb(color))    
 
     def bresenham(self, imagen, x0, y0, x1, y1, color):
         dx = abs(x1 - x0) 

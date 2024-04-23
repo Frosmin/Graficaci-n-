@@ -5,7 +5,7 @@ class Line:
     # def __init__(self, canva, id, colorRelleno, colorBorde, tipoBorde, bordeAncho, centro, radio) -> None:
     def __init__(
         self, canva, id, colorBorde, tipoBorde, bordeAncho, puntoInicio, puntoFinal
-    ) -> None:
+    ):
         self.isFilled = False
         self.canvas = canva
         self.id = id
@@ -41,13 +41,19 @@ class Line:
 
         return (r, g, b)
 
-    def draw_pixel(self, imagen, x, y, colorsssssss, grosor=1):
+    def draw_pixel(self, imagen, x, y, color, grosor=1):
         if 0 <= x < 700 and 0 <= y < 600:
-            nuevoColor = self.hex_to_rgb(colorsssssss)
-            imagen.putpixel((int(x), int(y)), nuevoColor)
+            suma = 0 if (grosor%2==0) else 1
+            half_thickness = int(grosor // 2)
+            for dx in range(-half_thickness, half_thickness + suma):
+                for dy in range(-half_thickness, half_thickness + suma):
+                    #draw.line([(x + dx, y + dy), (x + dx + 1, y + dy + 1)], fill=color, width=1)
+                    if ((0 < x < 700) and (0 < y < 700)):
+                        imagen.putpixel((int(x + dx), int(y + dy)), self.hex_to_rgb(color))
 
     # def draw_line_bresenham
     def draw(self, imagen):
+        self.segment = 15
         grosor = self.bordeAncho
 
         puntosEscalados = self._escalar()
@@ -62,14 +68,15 @@ class Line:
         sy = -1 if y0 > y1 else 1
         err = dx - dy
         while x0 != x1 or y0 != y1:
-            if self.tipoBorde == "Segmentado":
+            print(self.tipoBorde)
+            if self.tipoBorde == "Segmentado" or self.tipoBorde[0] == "Segmentado": # odio mi vida
                 if self.segment == 0:
                     self.segment = 15
                 if self.segment > 5:
-                    self.draw_pixel(imagen, x0, y0, self.colorBorde)
+                    self.draw_pixel(imagen, x0, y0, self.colorBorde, grosor)
                 self.segment -= 1
             else:
-                self.draw_pixel(imagen, x0, y0, self.colorBorde)
+                self.draw_pixel(imagen, x0, y0, self.colorBorde, grosor)
             e2 = 2 * err
             if e2 > -dy:
                 err -= dy
