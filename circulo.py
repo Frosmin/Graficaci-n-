@@ -164,24 +164,6 @@ class Circle:
     def rotar(self, angulo):
         self.angulo = angulo
 
-
-    # esto no es flood fill xd
-    # def flood_fill_circle(self):
-    #     radio = self.radio * self.escala
-    #     for y in range(round(self.centro[1] - radio), round(self.centro[1] + radio)):
-    #         for x in range(
-    #             round(self.centro[0] - radio), round(self.centro[0] + radio)
-    #         ):
-    #             if (x - self.centro[0]) ** 2 + (y - self.centro[1]) ** 2 <= radio**2:
-    #                 self.canvas.create_rectangle(
-    #                     x,
-    #                     y,
-    #                     x + 1,
-    #                     y + 1,
-    #                     fill=self.colorRelleno,
-    #                     outline=self.colorRelleno,
-    #                 )
-
     def flood_fill(self, imagen, xi, yi, fill_color, border_color):
         stack = [(xi, yi)]
         visited = set()
