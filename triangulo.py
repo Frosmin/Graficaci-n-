@@ -23,7 +23,7 @@ class Triangulo():
         for i in range(len(self.puntos)):
             x, y = self.puntos[i]
             self.puntos[i] = (x + deltaX, y + deltaY)
-
+    
     def escalar(self, escala):
         self.escala = escala
         puntosEscala = self._escalar()
@@ -33,7 +33,7 @@ class Triangulo():
         self.angulo = angulo
         nuevosPuntos = self._rotar(self.puntos)
         self.puntos = nuevosPuntos
-
+    
     def _escalar(self):
         # Calcular el punto de anclaje (primer punto)
         anchor_x, anchor_y = self.puntos[0]
@@ -52,25 +52,24 @@ class Triangulo():
             puntos_finales.append((x + anchor_x, y + anchor_y))
 
         return puntos_finales
-
+    
     def draw(self, imagen):
         self.segment = 8
         nuevosPuntos = self.puntos
         if self.isFilled:
             self.scanline(imagen, nuevosPuntos)
-    
         self.bresenham(imagen, *nuevosPuntos[0], *nuevosPuntos[1], self.colorBorde)
         self.bresenham(imagen, *nuevosPuntos[1], *nuevosPuntos[2], self.colorBorde)
         self.bresenham(imagen, *nuevosPuntos[2], *nuevosPuntos[0], self.colorBorde)
-        
+    
     def draw_pixel(self, imagen, x, y, color="#000000", grosor=1):
-        if 0 <= x < 700 and 0 <= y < 600:
+        if ((0 <= x < 700 ) and (0 <= y < 600)):
             suma = 0 if (grosor%2==0) else 1
             half_thickness = int(grosor // 2)
             for dx in range(-half_thickness, half_thickness + suma):
                 for dy in range(-half_thickness, half_thickness + suma):
                     #draw.line([(x + dx, y + dy), (x + dx + 1, y + dy + 1)], fill=color, width=1)
-                    if ((0 < x < 700) and (0 < y < 700)):
+                    if ((0 <= int(x+dx) < 700) and (0 <= int(y+dy ) < 600)):
                         imagen.putpixel((int(x + dx), int(y + dy)), self.hex_to_rgb(color))    
 
     def bresenham(self, imagen, x0, y0, x1, y1, color):
@@ -94,7 +93,7 @@ class Triangulo():
             if e2 < dx:
                 err += (dx)
                 y0 += (sy)
-                
+    
     def bresenhamSinSegmentadoXD(self, imagen, x0, y0, x1, y1, color):
         dx = abs(x1 - x0) 
         dy = abs(y1 - y0) 
@@ -110,7 +109,7 @@ class Triangulo():
             if e2 < dx:
                 err += (dx)
                 y0 += (sy)
-        
+    
     def _rotar(self, nuevosPuntos):
         # Calcular el punto de anclaje (primer punto)
         anchor_x, anchor_y = nuevosPuntos[0]

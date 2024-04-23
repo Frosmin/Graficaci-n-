@@ -24,13 +24,13 @@ class Circle:
     # TODO agregar el grosor de borde PRIORITY:HIGH
     def draw_pixel(self, imagen, x, y, color="#000000", grosor=1):
         
-        if 0 <= x < 700 and 0 <= y < 600:
+        if (0 <= x < 700) and (0 <= y < 600):
             suma = 0 if (grosor%2==0) else 1
             half_thickness = int(grosor // 2)
             for dx in range(-half_thickness, half_thickness + suma):
                 for dy in range(-half_thickness, half_thickness + suma):
                     #draw.line([(x + dx, y + dy), (x + dx + 1, y + dy + 1)], fill=color, width=1)
-                    if ((0 < x < 700) and (0 < y < 700)):
+                    if ((0 < (int(x + dx)< 700) and (0 < int(y + dy) < 600)):
                         imagen.putpixel((int(x + dx), int(y + dy)), self.hex_to_rgb(color))
 
     # def draw_circle_bresenham
