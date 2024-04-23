@@ -30,7 +30,7 @@ class Circle:
             for dx in range(-half_thickness, half_thickness + suma):
                 for dy in range(-half_thickness, half_thickness + suma):
                     #draw.line([(x + dx, y + dy), (x + dx + 1, y + dy + 1)], fill=color, width=1)
-                    if ((0 < (int(x + dx)< 700) and (0 < int(y + dy) < 600)):
+                    if (0 < (int(x + dx)< 700) and (0 < int(y + dy) < 600)):
                         imagen.putpixel((int(x + dx), int(y + dy)), self.hex_to_rgb(color))
 
     # def draw_circle_bresenham
